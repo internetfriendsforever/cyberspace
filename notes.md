@@ -7,17 +7,14 @@ In progress notes
 ### website
 Website starting point
 
-### auth0
-Auth0 auth middleware
+### basic-auth
+Basic auth middleware
 
-### s3
+### s3-storage
 Amazon S3 object storage middleware
 
-### dynamodb
-Amazon DynamoDB database middleware
-
-### firebase
-Google Firebase auth, storage and database middleware
+### s3-database
+Amazon S3 database middleware
 
 ### editor
 Content editor
