@@ -4,36 +4,29 @@ In progress notes
 
 ## Packages
 
-### @cyberspace/website
+### website
 Website starting point
 
-
-
-### @cyberspace/auth0
+### auth0
 Auth0 auth middleware
 
-### @cyberspace/s3
+### s3
 Amazon S3 object storage middleware
 
-### @cyberspace/dynamodb
+### dynamodb
 Amazon DynamoDB database middleware
 
-### @cyberspace/firebase
+### firebase
 Google Firebase auth, storage and database middleware
 
-
-
-### @cyberspace/editor
+### editor
 Content editor
 
-### @cyberspace/editor-preview
-Previews for content editor
-
-### @cyberspace/editor-text-field
+### editor-text-field
 Text field for content editor
 
-### @cyberspace/editor-image-field
+### editor-image-field
 Image field for content editor
 
-### @cyberspace/editor-slider-field
+### editor-slider-field
 Slider field for content editor
