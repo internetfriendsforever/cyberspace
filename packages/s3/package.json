@@ -1,0 +1,14 @@
+{
+  "name": "@cyberspace/s3",
+  "version": "0.0.1",
+  "description": "Amazon S3 objects middleware",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/basic-auth",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.309.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3"
+  }
+}

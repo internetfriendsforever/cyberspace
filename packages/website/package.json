@@ -1,0 +1,13 @@
+{
+  "name": "@cyberspace/website",
+  "version": "0.0.1",
+  "description": "Website starting point",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/website",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@cyberspace/basic-auth": "^0.0.1",
+    "@cyberspace/s3": "^0.0.1",
+    "express": "^4.16.3"
+  }
+}

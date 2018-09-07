@@ -10,11 +10,8 @@ Website starting point
 ### basic-auth
 Basic auth middleware
 
-### s3-storage
-Amazon S3 object storage middleware
-
-### s3-database
-Amazon S3 database middleware
+### s3
+Amazon S3 storage and database middlewares
 
 ### editor
 Content editor

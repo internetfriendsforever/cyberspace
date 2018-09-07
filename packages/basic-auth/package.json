@@ -1,0 +1,12 @@
+{
+  "name": "@cyberspace/basic-auth",
+  "version": "0.0.1",
+  "description": "Basic auth middleware",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/basic-auth",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "basic-auth": "^2.0.0"
+  }
+}
