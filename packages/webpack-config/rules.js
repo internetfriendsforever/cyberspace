@@ -24,5 +24,20 @@ module.exports = [
       name: '[name]-[hash].[ext]',
       outputPath: 'static'
     }
+  },
+
+  {
+    test: /\.css$/,
+    use: [
+      {
+        loader: 'file-loader',
+        options: {
+          name: '[name]-[hash].[ext]',
+          outputPath: 'static'
+        }
+      },
+      'extract-loader',
+      'css-loader'
+    ]
   }
 ]
