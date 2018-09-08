@@ -9,6 +9,8 @@ const argv = minimist(process.argv.slice(2))
 
 const config = require(path.resolve(argv.config || 'webpack.config.js'))
 
+console.log(config)
+
 if (Array.isArray(config)) {
   config.forEach(config => {
     config.mode = 'development'

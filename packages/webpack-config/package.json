@@ -1,0 +1,16 @@
+{
+  "name": "@cyberspace/webpack-config",
+  "version": "0.0.1",
+  "description": "Default webpack config",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/webpack-config",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "7",
+    "file-loader": "^2.0.0",
+    "webpack-node-externals": "^1.7.2",
+    "webpack-stats-plugin": "^0.2.1"
+  }
+}
