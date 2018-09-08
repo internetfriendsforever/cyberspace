@@ -1,0 +1,16 @@
+{
+  "name": "@cyberspace/webpack-development",
+  "version": "0.0.1",
+  "description": "Run webpack development with child process exec (i.e. start server after build)",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/webpack-development",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "webpack": "^4.17.2"
+  },
+  "bin": {
+    "webpack-development": "index.js"
+  }
+}
