@@ -19,9 +19,9 @@ module.exports = {
 
   plugins: [
     new StatsWriterPlugin({
-      filename: 'scripts/client.json',
+      filename: 'scripts/client',
       transform (data) {
-        return JSON.stringify(data.assetsByChunkName.main)
+        return data.assetsByChunkName.main
       }
     })
   ]
