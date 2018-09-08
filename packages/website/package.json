@@ -6,7 +6,7 @@
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "webpack-development --exec 'node build/server'"
+    "dev": "webpack-development --config node_modules/@cyberspace/webpack-config --exec 'node build/server'"
   },
   "dependencies": {
     "@cyberspace/basic-auth": "^0.0.1",
