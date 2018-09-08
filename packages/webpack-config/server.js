@@ -3,7 +3,10 @@ const nodeExternals = require('webpack-node-externals')
 const rules = require('./rules')
 
 module.exports = {
-  entry: './src/server.js',
+  entry: [
+    require.resolve('@babel/polyfill'),
+    './src/server.js'
+  ],
 
   target: 'node',
 

@@ -2,10 +2,23 @@ module.exports = [
   {
     test: /\.js$/,
     exclude: /node_modules/,
-    loader: 'babel-loader'
-  }, {
+    loader: require.resolve('babel-loader'),
+    options: {
+      presets: [
+        require.resolve('@babel/preset-env'),
+        require.resolve('@babel/preset-react')
+      ],
+
+      plugins: [
+        require.resolve('@babel/plugin-proposal-class-properties'),
+        require.resolve('@babel/plugin-proposal-object-rest-spread')
+      ]
+    }
+  },
+
+  {
     test: /\.(jpg|jpeg|png|gif|woff|woff2|svg|ttf|otf|ico)$/,
-    loader: 'file-loader',
+    loader: require.resolve('file-loader'),
     options: {
       name: '[name]-[hash].[ext]',
       outputPath: 'static'

@@ -3,7 +3,10 @@ const { StatsWriterPlugin } = require('webpack-stats-plugin')
 const rules = require('./rules')
 
 module.exports = {
-  entry: './src/client.js',
+  entry: [
+    require.resolve('@babel/polyfill'),
+    './src/client.js'
+  ],
 
   target: 'web',
 
