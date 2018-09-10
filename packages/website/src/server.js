@@ -46,6 +46,7 @@ app.use((req, res) => {
       </head>
       <body>
         ${html}
+        <script>window.data = ${JSON.stringify(data)};</script>
         <script src='/${client}'></script>
       </body>
     </html>

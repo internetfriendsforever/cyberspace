@@ -23,6 +23,39 @@ module.exports = {
     }
 
     return null
+  },
+
+  start: (handler, { initial = true, pop = true, click = true } = {}) => {
+    if (initial) {
+      handler()
+    }
+
+    if (pop) {
+      window.addEventListener('popstate', () => {
+        handler()
+      })
+    }
+
+    if (click) {
+      window.addEventListener('click', e => {
+        e.preventDefault()
+
+        const link = e.target.closest('a')
+
+        if (link) {
+          const domain = url => url.replace('http://', '').replace('https://', '').split('/')[0]
+          const external = domain(window.location.href) !== domain(link.href)
+
+          if (!external) {
+            const { pathname, search = '', hash = '' } = link
+            window.history.pushState(null, null, `${pathname}${search}${hash}`)
+            render(pathname)
+          } else {
+            window.open(link.href)
+          }
+        }
+      })
+    }
   }
 }
 
