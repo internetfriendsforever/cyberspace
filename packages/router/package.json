@@ -1,0 +1,11 @@
+{
+  "name": "@cyberspace/router",
+  "version": "0.0.1",
+  "description": "Router for node and browser",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/router",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "dependencies": {
+    "path-to-regexp": "^2.4.0"
+  }
+}

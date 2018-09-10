@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@cyberspace/basic-auth": "^0.0.1",
+    "@cyberspace/router": "^0.0.1",
     "@cyberspace/s3": "^0.0.1",
     "@cyberspace/webpack-config": "^0.0.1",
     "@cyberspace/webpack-development": "^0.0.1",
