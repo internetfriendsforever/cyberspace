@@ -6,7 +6,11 @@
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "webpack-development --config node_modules/@cyberspace/webpack-config --exec 'node build/server'"
+    "deploy": "now --regions bru --env NODE_ENV=\"production\"",
+    "build": "webpack --config node_modules/@cyberspace/webpack-config --mode=production",
+    "start": "node build/server.js",
+    "dev": "webpack-development --config node_modules/@cyberspace/webpack-config --exec 'node build/server'",
+    "clean": "rm -rf build"
   },
   "dependencies": {
     "@cyberspace/basic-auth": "^0.0.1",
@@ -14,10 +18,14 @@
     "@cyberspace/s3": "^0.0.1",
     "@cyberspace/webpack-config": "^0.0.1",
     "@cyberspace/webpack-development": "^0.0.1",
-    "eslint-plugin-import": "^2.14.0",
+    "emotion": "^9.2.8",
+    "emotion-server": "^9.2.8",
     "express": "^4.16.3",
     "react": "^16.5.0",
-    "react-dom": "^16.5.0"
+    "react-dom": "^16.5.0",
+    "react-emotion": "^9.2.8",
+    "webpack": "^4.17.2",
+    "webpack-cli": "^3.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^9.0.0",

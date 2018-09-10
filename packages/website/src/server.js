@@ -5,7 +5,10 @@ import basicAuth from '@cyberspace/basic-auth'
 import s3 from '@cyberspace/s3'
 import router from '@cyberspace/router'
 import { renderToString } from 'react-dom/server'
+import { renderStylesToString } from 'emotion-server'
 import routes from './routes'
+import favicon from './assets/favicon.png'
+import styles from './styles.css'
 
 const app = express()
 
@@ -43,10 +46,11 @@ app.use((req, res) => {
         <title>${title}</title>
         <meta charset='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <link rel='icon' type='image/png' href='' />
+        <link rel='stylesheet' href='${styles}' />
+        <link rel='icon' type='image/png' href='${favicon}'>
       </head>
       <body>
-        <div id='root'>${renderToString(component)}</div>
+        <div id='root'>${renderStylesToString(renderToString(component))}</div>
         <script>window.data = ${JSON.stringify(data)};</script>
         <script src='/${client}'></script>
       </body>

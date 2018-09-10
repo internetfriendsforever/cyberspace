@@ -43,14 +43,14 @@ const rules = [
     test: /\.css$/,
     use: [
       {
-        loader: 'file-loader',
+        loader: require.resolve('file-loader'),
         options: {
           name: '[name]-[hash].[ext]',
           outputPath: 'static'
         }
       },
-      'extract-loader',
-      'css-loader'
+      require.resolve('extract-loader'),
+      require.resolve('css-loader')
     ]
   }
 ]
