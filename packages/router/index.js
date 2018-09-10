@@ -49,7 +49,7 @@ module.exports = {
           if (!external) {
             const { pathname, search = '', hash = '' } = link
             window.history.pushState(null, null, `${pathname}${search}${hash}`)
-            render(pathname)
+            handler(pathname)
           } else {
             window.open(link.href)
           }

@@ -4,6 +4,7 @@ import express from 'express'
 import basicAuth from '@cyberspace/basic-auth'
 import s3 from '@cyberspace/s3'
 import router from '@cyberspace/router'
+import { renderToString } from 'react-dom/server'
 import routes from './routes'
 
 const app = express()
@@ -33,7 +34,7 @@ const client = fs.readFileSync(path.join(__dirname, 'scripts/client'))
 
 app.use((req, res) => {
   const data = { foo: 'bar' }
-  const { title, html, statusCode = 200 } = router.resolve(routes, req.path, data)
+  const { title, component, statusCode = 200 } = router.resolve(routes, req.path, data)
 
   res.status(statusCode).send(`
     <!doctype html>
@@ -45,7 +46,7 @@ app.use((req, res) => {
         <link rel='icon' type='image/png' href='' />
       </head>
       <body>
-        ${html}
+        <div id='root'>${renderToString(component)}</div>
         <script>window.data = ${JSON.stringify(data)};</script>
         <script src='/${client}'></script>
       </body>

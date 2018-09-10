@@ -1,22 +1,45 @@
+import React from 'react'
+import Page from './components/Page'
+import Home from './pages/Home'
+import About from './pages/About'
+import Category from './pages/Category'
+import NotFound from './pages/NotFound'
+
 export default {
   '/': () => ({
     title: 'Home',
-    html: 'Home page'
+    component: (
+      <Page>
+        <Home />
+      </Page>
+    )
   }),
 
   '/about': (params, data) => ({
     title: 'About',
-    html: `About with data: <pre>${JSON.stringify(data, null, 2)}</pre>`
+    component: (
+      <Page>
+        <About data={data} />
+      </Page>
+    )
   }),
 
-  '/categories/:slug': (params) => ({
+  '/category/:slug': (params) => ({
     title: `Category: ${params.slug}`,
-    html: `Category: ${params.slug}`
+    component: (
+      <Page>
+        <Category slug={params.slug} />
+      </Page>
+    )
   }),
 
   '404': () => ({
     statusCode: 404,
     title: 'Not found',
-    html: 'Page not found'
+    component: (
+      <Page>
+        <NotFound />
+      </Page>
+    )
   })
 }
