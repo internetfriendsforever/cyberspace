@@ -1,6 +1,9 @@
 {
   "name": "@cyberspace/basic-auth",
   "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Basic auth middleware",
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/basic-auth",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",

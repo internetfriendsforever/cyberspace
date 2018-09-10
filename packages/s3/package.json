@@ -1,6 +1,9 @@
 {
   "name": "@cyberspace/s3",
   "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Amazon S3 objects middleware",
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/s3",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",

@@ -1,6 +1,9 @@
 {
   "name": "@cyberspace/router",
   "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Router for node and browser",
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/router",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",

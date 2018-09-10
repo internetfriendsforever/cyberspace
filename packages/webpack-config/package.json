@@ -1,6 +1,9 @@
 {
   "name": "@cyberspace/webpack-config",
   "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Default webpack config",
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/webpack-config",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",

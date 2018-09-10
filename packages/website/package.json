@@ -1,6 +1,9 @@
 {
   "name": "@cyberspace/website",
   "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Website starting point",
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/website",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
