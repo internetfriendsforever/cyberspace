@@ -3,7 +3,9 @@ import router from '@cyberspace/router'
 import routes from './routes'
 
 router.start((path = window.location.pathname) => {
-  const { title, component } = router.resolve(routes, path, window.data)
-  document.title = title
-  hydrate(component, document.getElementById('root'))
+  window.fetch('/session').then(res => res.json()).then(session => {
+    const { title, component } = router.resolve(routes, path, session)
+    document.title = title
+    hydrate(component, document.getElementById('root'))
+  })
 })

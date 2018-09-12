@@ -1,18 +1,20 @@
 const auth = require('basic-auth')
 
-module.exports = ({ users, failure }) => (req, res, next) => {
-  const credentials = auth(req)
+module.exports = function ({ users, failure }) {
+  return (req, res, next) => {
+    const credentials = auth(req)
 
-  if (credentials && check(credentials, users)) {
-    next()
-  } else {
-    res.status(401)
-    res.set('WWW-Authenticate', 'Basic')
-
-    if (failure) {
-      failure(req, res, next)
+    if (credentials && check(credentials, users)) {
+      next()
     } else {
-      res.end('Access denied')
+      res.status(401)
+      res.set('WWW-Authenticate', 'Basic')
+
+      if (failure) {
+        failure(req, res, next)
+      } else {
+        res.end('Access denied')
+      }
     }
   }
 }

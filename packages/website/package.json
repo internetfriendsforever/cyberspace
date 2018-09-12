@@ -19,6 +19,7 @@
     "@cyberspace/basic-auth": "^0.0.2",
     "@cyberspace/router": "^0.0.2",
     "@cyberspace/s3": "^0.0.2",
+    "@cyberspace/user-auth": "^0.0.2",
     "@cyberspace/webpack-config": "^0.0.2",
     "@cyberspace/webpack-development": "^0.0.2",
     "emotion": "^9.2.8",

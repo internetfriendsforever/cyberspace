@@ -3,6 +3,7 @@ import Page from './components/Page'
 import Home from './pages/Home'
 import About from './pages/About'
 import Category from './pages/Category'
+import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 
 export default {
@@ -15,20 +16,49 @@ export default {
     )
   }),
 
-  '/about': (params, data) => ({
+  '/about': params => ({
     title: 'About',
     component: (
       <Page>
-        <About data={data} />
+        <About />
       </Page>
     )
   }),
 
-  '/category/:slug': (params) => ({
+  '/category/:slug': params => ({
     title: `Category: ${params.slug}`,
     component: (
       <Page>
         <Category slug={params.slug} />
+      </Page>
+    )
+  }),
+
+  '/login': (params, session = {}) => ({
+    title: `Login`,
+    component: (
+      <Page>
+        {JSON.stringify(session)}
+        <Login error={session.loginError} />
+      </Page>
+    )
+  }),
+
+  '/logout': params => ({
+    title: `Login`,
+    component: (
+      <Page>
+        You are logged out
+      </Page>
+    )
+  }),
+
+  '/profile': params => ({
+    title: `Profile`,
+    component: (
+      <Page>
+        <div>User profile</div>
+        <a href='/logout'>Logout</a>
       </Page>
     )
   }),

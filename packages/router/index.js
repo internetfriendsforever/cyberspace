@@ -38,11 +38,11 @@ module.exports = {
 
     if (click) {
       window.addEventListener('click', e => {
-        e.preventDefault()
-
         const link = e.target.closest('a')
 
         if (link) {
+          e.preventDefault()
+
           const domain = url => url.replace('http://', '').replace('https://', '').split('/')[0]
           const external = domain(window.location.href) !== domain(link.href)
 

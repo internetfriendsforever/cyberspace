@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import express from 'express'
 import basicAuth from '@cyberspace/basic-auth'
+import userAuth from '@cyberspace/user-auth'
 import s3 from '@cyberspace/s3'
 import router from '@cyberspace/router'
 import { renderToString } from 'react-dom/server'
@@ -12,32 +13,43 @@ import styles from './styles.css'
 
 const app = express()
 
-const auth = basicAuth({
-  users: [{
-    username: 'admin',
-    password: 'secret'
-  }]
+const getUser = async username => ({
+  username: 'daniel'
 })
 
-const region = 'eu-west-1'
-const bucket = 'cyberspace-website'
+const auth = userAuth({
+  getUser: getUser,
 
-app.use('/api',
-  auth,
-  s3.storage({ bucket, region }),
-  s3.database({ bucket, region })
-)
+  getPasswordHash: async username => (
+    '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum'
+  ),
+
+  serializeUser: async user => user.username,
+  deserializeUser: getUser
+})
+
+app.use(auth.api())
 
 app.use('/static', express.static(path.join(__dirname, 'static'), {
   immutable: true,
   maxAge: '1y'
 }))
 
+app.use('/secret', basicAuth({
+  users: [{
+    username: 'admin',
+    password: 'secret'
+  }]
+}), (req, res) => {
+  res.status(200).send('Secret page')
+})
+
+app.get('/profile', auth.required())
+
 const client = fs.readFileSync(path.join(__dirname, 'scripts/client'))
 
 app.use((req, res) => {
-  const data = { foo: 'bar' }
-  const { title, component, statusCode = 200 } = router.resolve(routes, req.path, data)
+  const { title, component, statusCode = 200 } = router.resolve(routes, req.path, req.session)
 
   res.status(statusCode).send(`
     <!doctype html>
@@ -51,7 +63,6 @@ app.use((req, res) => {
       </head>
       <body>
         <div id='root'>${renderStylesToString(renderToString(component))}</div>
-        <script>window.data = ${JSON.stringify(data)};</script>
         <script src='/${client}'></script>
       </body>
     </html>
