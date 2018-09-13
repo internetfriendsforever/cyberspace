@@ -13,7 +13,7 @@ import styles from './styles.css'
 const app = express()
 
 const auth = userAuth({
-  getPasswordHash: async username => '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum',
+  getHash: async username => '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum',
   getEmail: async username => 'daniel@internetfriendsforever.com'
 })
 
