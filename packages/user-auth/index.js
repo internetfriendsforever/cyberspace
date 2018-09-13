@@ -9,12 +9,9 @@ const LocalStrategy = require('passport-local').Strategy
 
 const saltRounds = 12
 
-module.exports = function ({
-  getPasswordHash,
-  getEmail
-}) {
+module.exports = function ({ getHash, getEmail }) {
   const strategy = new LocalStrategy((username, password, callback) => {
-    getPasswordHash(username)
+    getHash(username)
       .then(hash => bcrypt.compare(password, hash))
       .then(isMatch => {
         if (isMatch) {
