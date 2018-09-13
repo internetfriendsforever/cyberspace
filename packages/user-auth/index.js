@@ -1,15 +1,19 @@
 const url = require('url')
+const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 const express = require('express')
 const session = require('express-session')
+const nodemailer = require('nodemailer')
 const LocalStrategy = require('passport-local').Strategy
 
 const saltRounds = 12
+const ivLength = 16
+const tokenAlgorithm = 'aes-256-cbc'
 
-module.exports = function ({ getHash, getEmail }) {
+module.exports = function ({ getHash, getEmail, mail, secret }) {
   const strategy = new LocalStrategy((username, password, callback) => {
     getHash(username)
       .then(hash => bcrypt.compare(password, hash))
@@ -32,7 +36,7 @@ module.exports = function ({ getHash, getEmail }) {
     return [
       cookieParser(),
       session({
-        secret: 'n0rs4kjetrr5evarer',
+        secret,
         resave: false,
         saveUninitialized: false
       }),
@@ -42,24 +46,40 @@ module.exports = function ({ getHash, getEmail }) {
   }
 
   function errorRedirect () {
-    return (error, req, res) => {
-      res.redirect(req.query.errorRedirect || url.format({
-        pathname: req.path,
-        query: Object.assign({ error }, req.query)
-      }))
+    return (req, res, next) => {
+      const { errorRedirect, error } = req.query
+
+      if (errorRedirect) {
+        res.redirect(errorRedirect)
+      } else if (!error) {
+        res.redirect(url.format({
+          pathname: req.path,
+          query: Object.assign({ error }, req.query)
+        }))
+      } else {
+        next()
+      }
     }
   }
 
   function successRedirect () {
-    return (req, res) => {
-      res.redirect(req.query.successRedirect || url.format({
-        pathname: req.path,
-        query: Object.assign({ success: true }, req.query)
-      }))
+    return (req, res, next) => {
+      const { successRedirect, success } = req.query
+
+      if (successRedirect) {
+        res.redirect(successRedirect)
+      } else if (!success) {
+        res.redirect(url.format({
+          pathname: req.path,
+          query: Object.assign({ success: true }, req.query)
+        }))
+      } else {
+        next()
+      }
     }
   }
 
-  function login (handleError = errorRedirect()) {
+  function login ({ handleError, handleSuccess }) {
     return [
       bodyParser.urlencoded({ extended: false }),
       (req, res, next) => {
@@ -79,14 +99,14 @@ module.exports = function ({ getHash, getEmail }) {
 
             req.session.user = req.session.passport.user
 
-            next()
+            handleSuccess(req, res, next)
           })
         })(req, res, next)
       }
     ]
   }
 
-  function logout () {
+  function logout ({ handleSuccess }) {
     return function (req, res, next) {
       if (req.session) {
         delete req.session.user
@@ -94,25 +114,79 @@ module.exports = function ({ getHash, getEmail }) {
 
       req.logout()
 
-      next()
+      handleSuccess(req, res, next)
     }
   }
 
-  function forgotPassword (handleError = errorRedirect()) {
+  function checkToken ({ handleError, handleSuccess }) {
+    return function (req, res, next) {
+      if (req.query.token) {
+        try {
+          const { username, expires } = JSON.parse(readToken(req.query.token, secret))
+
+          if (Date.now() < expires) {
+            return req.login(username, error => {
+              if (error) {
+                return handleError('internal', req, res, next)
+              }
+
+              req.session.user = req.session.passport.user
+
+              return handleSuccess(req, res, next)
+            })
+          } else {
+            return handleError('expired', req, res, next)
+          }
+        } catch (error) {
+          return handleError('internal', req, res, next)
+        }
+
+        return handleError('internal', req, res, next)
+      } else {
+        next()
+      }
+    }
+  }
+
+  function forgotPassword ({ handleError, handleSuccess }) {
     return [
       bodyParser.urlencoded({ extended: false }),
+
       (req, res, next) => {
-        getEmail(req.body.username)
+        const username = req.body.username
+
+        if (!username) {
+          return handleError('missing-user', req, res, next)
+        }
+
+        getEmail(username)
           .then(email => {
             if (!email) {
               return handleError('no-user', req, res, next)
             }
 
-            console.log('TODO: Send email to', email)
+            const token = createToken(JSON.stringify({
+              username: username,
+              expires: Date.now() + 1000 * 60 * 60
+            }), secret)
 
-            next()
+            return mail.templates.forgotPassword({
+              token: token
+            }).then(template => (
+              sendMail(mail.smtp, Object.assign({ to: email }, template))
+            )).then(info => {
+              console.log('Message sent: %s', info.messageId)
+
+              const previewUrl = nodemailer.getTestMessageUrl(info)
+
+              if (previewUrl) {
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info))
+              }
+            })
           })
+          .then(() => handleSuccess(req, res, next))
           .catch(error => {
+            console.error(error)
             return handleError('internal', req, res, next)
           })
       }
@@ -123,9 +197,17 @@ module.exports = function ({ getHash, getEmail }) {
     const router = express.Router()
 
     router.use(initialize())
-    router.post('/login', login(), successRedirect())
-    router.post('/forgot-password', forgotPassword(), successRedirect())
-    router.get('/logout', logout())
+
+    const defaultParams = {
+      handleError: errorRedirect(),
+      handleSuccess: successRedirect()
+    }
+
+    router.post('/login', login(defaultParams))
+    router.post('/forgot-password', forgotPassword(defaultParams))
+    router.get('/check-token', checkToken(defaultParams))
+    router.get('/logout', logout(defaultParams))
+
     router.get('/session', (req, res, next) => {
       res.status(200).json(req.session)
     })
@@ -137,6 +219,48 @@ module.exports = function ({ getHash, getEmail }) {
     initialize,
     login,
     logout,
+    forgotPassword,
+    checkToken,
     api
   }
+}
+
+function sendMail (smtp, mail) {
+  return getTransport(smtp).then(transport => transport.sendMail(mail))
+}
+
+function getTransport (smtp) {
+  if (smtp) {
+    return Promise.resolve(nodemailer.createTransport(smtp))
+  }
+
+  return nodemailer.createTestAccount().then(account => (
+    nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: account.user,
+        pass: account.pass
+      }
+    })
+  ))
+}
+
+function createToken (text, secret) {
+  const iv = crypto.randomBytes(ivLength)
+  const cipher = crypto.createCipheriv(tokenAlgorithm, new Buffer(secret), iv)
+  let encrypted = cipher.update(text)
+  encrypted = Buffer.concat([encrypted, cipher.final()])
+  return iv.toString('hex') + ':' + encrypted.toString('hex')
+}
+
+function readToken (text, secret) {
+  const textParts = text.split(':')
+  const iv = new Buffer(textParts.shift(), 'hex')
+  const encryptedText = new Buffer(textParts.join(':'), 'hex')
+  const decipher = crypto.createDecipheriv(tokenAlgorithm, new Buffer(secret), iv)
+  let decrypted = decipher.update(encryptedText)
+  decrypted = Buffer.concat([decrypted, decipher.final()])
+  return decrypted.toString()
 }

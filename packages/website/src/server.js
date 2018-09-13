@@ -13,8 +13,19 @@ import styles from './styles.css'
 const app = express()
 
 const auth = userAuth({
+  secret: 'sncjkel19284k3ismcnsu2o3i40s;ocs',
   getHash: async username => '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum',
-  getEmail: async username => 'daniel@internetfriendsforever.com'
+  getEmail: async username => 'daniel@internetfriendsforever.com',
+  mail: {
+    smtp: null,
+    templates: {
+      forgotPassword: async ({ username, token }) => ({
+        from: 'test@test.com',
+        subject: 'Forgot password',
+        text: `Login using this link: http://localhost:3000/check-token?token=${token}&successRedirect=/profile`
+      })
+    }
+  }
 })
 
 app.use(auth.api())

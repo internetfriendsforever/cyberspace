@@ -34,6 +34,9 @@ export default class ForgotPassword extends Component {
 
   getErrorMessage (code) {
     switch (code) {
+      case 'missing-user':
+        return 'Please enter a username'
+
       case 'no-user':
         return 'Could not find user'
 
