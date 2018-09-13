@@ -11,7 +11,7 @@ const saltRounds = 12
 
 module.exports = function ({
   getPasswordHash,
-  getUserEmail
+  getEmail
 }) {
   const strategy = new LocalStrategy((username, password, callback) => {
     getPasswordHash(username)
@@ -105,7 +105,7 @@ module.exports = function ({
     return [
       bodyParser.urlencoded({ extended: false }),
       (req, res, next) => {
-        getUserEmail(req.body.username)
+        getEmail(req.body.username)
           .then(email => {
             if (!email) {
               return handleError('no-user', req, res, next)

@@ -14,7 +14,7 @@ const app = express()
 
 const auth = userAuth({
   getPasswordHash: async username => '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum',
-  getUserEmail: async username => 'daniel@internetfriendsforever.com'
+  getEmail: async username => 'daniel@internetfriendsforever.com'
 })
 
 app.use(auth.api())
