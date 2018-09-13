@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Category from './pages/Category'
 import Login from './pages/Login'
+import Logout from './pages/Logout'
 import NotFound from './pages/NotFound'
 
 export default {
@@ -16,8 +17,9 @@ export default {
     )
   }),
 
-  '/about': params => ({
+  '/about': ({ params }) => ({
     title: 'About',
+    authRequired: true,
     component: (
       <Page>
         <About />
@@ -25,7 +27,7 @@ export default {
     )
   }),
 
-  '/category/:slug': params => ({
+  '/category/:slug': ({ params }) => ({
     title: `Category: ${params.slug}`,
     component: (
       <Page>
@@ -34,27 +36,31 @@ export default {
     )
   }),
 
-  '/login': (params, session = {}) => ({
+  '/login': ({ params, session, query, navigate }) => ({
     title: `Login`,
     component: (
       <Page>
-        {JSON.stringify(session)}
-        <Login error={session.loginError} />
+        <Login
+          error={session.loginError}
+          redirectTo={query.redirectTo}
+          navigate={navigate}
+        />
       </Page>
     )
   }),
 
-  '/logout': params => ({
+  '/logout': ({ params, session, navigate }) => ({
     title: `Login`,
     component: (
       <Page>
-        You are logged out
+        <Logout user={session.user} navigate={navigate} />
       </Page>
     )
   }),
 
-  '/profile': params => ({
+  '/profile': ({ params }) => ({
     title: `Profile`,
+    authRequired: true,
     component: (
       <Page>
         <div>User profile</div>

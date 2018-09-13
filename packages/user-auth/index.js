@@ -21,7 +21,7 @@ module.exports = function ({
         if (isMatch) {
           return getUser(username)
         } else {
-          throw new Error('Password incorrect')
+          throw new Error('Password or username incorrect')
         }
       })
       .then(user => callback(null, user))
@@ -60,6 +60,11 @@ module.exports = function ({
   const login = (onFail = onFailDefault) => [
     bodyParser.urlencoded({ extended: false }),
     (req, res, next) => {
+      if (!req.body.username || !req.body.password) {
+        req.session.loginError = { message: 'Please provide a username and password to login' }
+        return onFail(req, res, next)
+      }
+
       passport.authenticate('local', (error, user) => {
         delete req.session.loginError
 
@@ -74,6 +79,8 @@ module.exports = function ({
             return onFail(req, res, next)
           }
 
+          req.session.user = req.session.passport.user
+
           next()
         })
       })(req, res, next)
@@ -81,6 +88,10 @@ module.exports = function ({
   ]
 
   const logout = () => (req, res, next) => {
+    if (req.session) {
+      delete req.session.user
+    }
+
     req.logout()
     next()
   }

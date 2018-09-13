@@ -44,25 +44,29 @@ app.use('/secret', basicAuth({
   res.status(200).send('Secret page')
 })
 
-app.get('/profile', auth.required())
-
 const client = fs.readFileSync(path.join(__dirname, 'scripts/client'))
 
 app.use((req, res) => {
-  const { title, component, statusCode = 200 } = router.resolve(routes, req.path, req.session)
+  const { session, query } = req
+  const { key, params } = router.resolve(routes, req.path)
+  const route = routes[key || '404']({ params, session, query })
 
-  res.status(statusCode).send(`
+  if (route.authRequired && !session.user) {
+    return res.redirect(`/login?redirectTo=${req.path}`)
+  }
+
+  res.status(route.statusCode || 200).send(`
     <!doctype html>
     <html lang='en'>
       <head>
-        <title>${title}</title>
+        <title>${route.title}</title>
         <meta charset='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='stylesheet' href='${styles}' />
         <link rel='icon' type='image/png' href='${favicon}'>
       </head>
       <body>
-        <div id='root'>${renderStylesToString(renderToString(component))}</div>
+        <div id='root'>${renderStylesToString(renderToString(route.component))}</div>
         <script src='/${client}'></script>
       </body>
     </html>

@@ -1,7 +1,7 @@
 const pathToRegexp = require('path-to-regexp')
 
 module.exports = {
-  resolve: (routes, rawPath, ...args) => {
+  resolve: (routes, rawPath) => {
     let keys = []
 
     const path = normalize(rawPath)
@@ -19,13 +19,13 @@ module.exports = {
         })
       }
 
-      return route(params, ...args)
+      return { key, params }
     }
 
     return null
   },
 
-  start: (handler, { initial = true, pop = true, click = true } = {}) => {
+  listen: (handler, { initial = true, pop = true, click = true } = {}) => {
     if (initial) {
       handler()
     }
@@ -56,6 +56,14 @@ module.exports = {
         }
       })
     }
+
+    const navigate = (path, options = {}) => {
+      const fn = options.replace ? 'replaceState' : 'pushState'
+      window.history[fn](null, null, path)
+      handler()
+    }
+
+    return navigate
   }
 }
 
