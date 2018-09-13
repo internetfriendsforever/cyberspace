@@ -6,7 +6,6 @@ import Category from './pages/Category'
 import Login from './pages/Login'
 import Logout from './pages/Logout'
 import ForgotPassword from './pages/ForgotPassword'
-import CheckToken from './pages/CheckToken'
 import NotFound from './pages/NotFound'
 
 export default {
@@ -61,15 +60,6 @@ export default {
     component: (
       <Page>
         <ForgotPassword query={query} navigate={navigate} />
-      </Page>
-    )
-  }),
-
-  '/check-token': ({ query }) => ({
-    title: 'Forgot password',
-    component: (
-      <Page>
-        <CheckToken query={query} />
       </Page>
     )
   }),

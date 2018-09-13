@@ -19,10 +19,10 @@ const auth = userAuth({
   mail: {
     smtp: null,
     templates: {
-      forgotPassword: async ({ username, token }) => ({
+      requestToken: async ({ username, token }) => ({
         from: 'test@test.com',
         subject: 'Forgot password',
-        text: `Login using this link: http://localhost:3000/check-token?token=${token}&successRedirect=/profile`
+        text: `Login using this link: http://localhost:3000/forgot-password?token=${token}&successRedirect=/profile`
       })
     }
   }

@@ -37,6 +37,9 @@ export default class ForgotPassword extends Component {
       case 'missing-user':
         return 'Please enter a username'
 
+      case 'expired':
+        return 'The link has expired. Please try again'
+
       case 'no-user':
         return 'Could not find user'
 

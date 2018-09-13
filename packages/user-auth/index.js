@@ -46,7 +46,7 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
   }
 
   function errorRedirect () {
-    return (req, res, next) => {
+    return (errorCode, req, res, next) => {
       const { errorRedirect, error } = req.query
 
       if (errorRedirect) {
@@ -54,7 +54,7 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
       } else if (!error) {
         res.redirect(url.format({
           pathname: req.path,
-          query: Object.assign({ error }, req.query)
+          query: Object.assign({ error: errorCode }, req.query)
         }))
       } else {
         next()
@@ -118,37 +118,7 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
     }
   }
 
-  function checkToken ({ handleError, handleSuccess }) {
-    return function (req, res, next) {
-      if (req.query.token) {
-        try {
-          const { username, expires } = JSON.parse(readToken(req.query.token, secret))
-
-          if (Date.now() < expires) {
-            return req.login(username, error => {
-              if (error) {
-                return handleError('internal', req, res, next)
-              }
-
-              req.session.user = req.session.passport.user
-
-              return handleSuccess(req, res, next)
-            })
-          } else {
-            return handleError('expired', req, res, next)
-          }
-        } catch (error) {
-          return handleError('internal', req, res, next)
-        }
-
-        return handleError('internal', req, res, next)
-      } else {
-        next()
-      }
-    }
-  }
-
-  function forgotPassword ({ handleError, handleSuccess }) {
+  function requestToken ({ handleError, handleSuccess }) {
     return [
       bodyParser.urlencoded({ extended: false }),
 
@@ -170,7 +140,7 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
               expires: Date.now() + 1000 * 60 * 60
             }), secret)
 
-            return mail.templates.forgotPassword({
+            return mail.templates.requestToken({
               token: token
             }).then(template => (
               sendMail(mail.smtp, Object.assign({ to: email }, template))
@@ -193,6 +163,37 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
     ]
   }
 
+  function validateToken ({ handleError, handleSuccess }) {
+    return function (req, res, next) {
+      if (req.query.token && !req.query.success && !req.query.error) {
+        try {
+          const { username, expires } = JSON.parse(readToken(req.query.token, secret))
+
+          if (Date.now() < expires) {
+            return req.login(username, error => {
+              if (error) {
+                return handleError('internal', req, res, next)
+              }
+
+              req.session.user = req.session.passport.user
+
+              return handleSuccess(req, res, next)
+            })
+          } else {
+            console.log('expired, handle error')
+            return handleError('expired', req, res, next)
+          }
+        } catch (error) {
+          return handleError('internal', req, res, next)
+        }
+
+        return handleError('internal', req, res, next)
+      } else {
+        next()
+      }
+    }
+  }
+
   function api () {
     const router = express.Router()
 
@@ -204,8 +205,8 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
     }
 
     router.post('/login', login(defaultParams))
-    router.post('/forgot-password', forgotPassword(defaultParams))
-    router.get('/check-token', checkToken(defaultParams))
+    router.post('/forgot-password', requestToken(defaultParams))
+    router.get('/forgot-password', validateToken(defaultParams))
     router.get('/logout', logout(defaultParams))
 
     router.get('/session', (req, res, next) => {
@@ -219,8 +220,8 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
     initialize,
     login,
     logout,
-    forgotPassword,
-    checkToken,
+    requestToken,
+    validateToken,
     api
   }
 }
