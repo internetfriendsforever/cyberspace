@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-export default class Login extends Component {
+export default class ForgotPassword extends Component {
   state = {
     error: this.props.query.error
   }
@@ -34,11 +34,8 @@ export default class Login extends Component {
 
   getErrorMessage (code) {
     switch (code) {
-      case 'missing-credentials':
-        return 'Please enter a username or password'
-
-      case 'incorrect-credentials':
-        return 'Incorrect username or password'
+      case 'no-user':
+        return 'Could not find user'
 
       case 'submit':
         return 'Could not submit form. Connection issues?'
@@ -49,17 +46,21 @@ export default class Login extends Component {
   }
 
   render () {
-    const successRedirect = this.props.query.successRedirect || '/profile'
+    const success = this.props.query.success
     const error = this.state.error
 
+    if (success) {
+      return (
+        <h2>An email has been sent with further instructions</h2>
+      )
+    }
+
     return (
-      <form action={`/login?successRedirect=${successRedirect}`} method='post' onSubmit={this.onSubmit}>
-        <h2>Login</h2>
+      <form action='/forgot-password' method='post' onSubmit={this.onSubmit}>
+        <h2>Forgot password</h2>
         {error && <p>{this.getErrorMessage(error)}</p>}
         <input type='text' name='username' placeholder='username' />
-        <input type='password' name='password' placeholder='password' />
         <input type='submit' />
-        <a href='/forgot-password'>Forgot your password?</a>
       </form>
     )
   }

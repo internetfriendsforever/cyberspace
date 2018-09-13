@@ -5,6 +5,7 @@ import About from './pages/About'
 import Category from './pages/Category'
 import Login from './pages/Login'
 import Logout from './pages/Logout'
+import ForgotPassword from './pages/ForgotPassword'
 import NotFound from './pages/NotFound'
 
 export default {
@@ -36,15 +37,11 @@ export default {
     )
   }),
 
-  '/login': ({ params, session, query, navigate }) => ({
+  '/login': ({ query, navigate }) => ({
     title: `Login`,
     component: (
       <Page>
-        <Login
-          error={session.loginError}
-          redirectTo={query.redirectTo}
-          navigate={navigate}
-        />
+        <Login query={query} navigate={navigate} />
       </Page>
     )
   }),
@@ -54,6 +51,15 @@ export default {
     component: (
       <Page>
         <Logout user={session.user} navigate={navigate} />
+      </Page>
+    )
+  }),
+
+  '/forgot-password': ({ query, navigate }) => ({
+    title: 'Forgot password',
+    component: (
+      <Page>
+        <ForgotPassword query={query} navigate={navigate} />
       </Page>
     )
   }),

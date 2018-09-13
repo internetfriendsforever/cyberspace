@@ -1,3 +1,7 @@
+import React from 'react'
+
 export default function Home () {
-  return 'Home page'
+  return (
+    <h2>Home page</h2>
+  )
 }

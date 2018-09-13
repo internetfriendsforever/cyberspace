@@ -1,3 +1,4 @@
+const url = require('url')
 const bcrypt = require('bcrypt')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
@@ -6,20 +7,18 @@ const express = require('express')
 const session = require('express-session')
 const LocalStrategy = require('passport-local').Strategy
 
-const saltRounds = 10
+const saltRounds = 12
 
 module.exports = function ({
-  getUser,
   getPasswordHash,
-  serializeUser,
-  deserializeUser
+  getUserEmail
 }) {
   const strategy = new LocalStrategy((username, password, callback) => {
     getPasswordHash(username)
       .then(hash => bcrypt.compare(password, hash))
       .then(isMatch => {
         if (isMatch) {
-          return getUser(username)
+          return username
         } else {
           throw new Error('Password or username incorrect')
         }
@@ -29,96 +28,107 @@ module.exports = function ({
   })
 
   passport.use(strategy)
+  passport.serializeUser((username, callback) => callback(null, username))
+  passport.deserializeUser((username, callback) => callback(null, username))
 
-  passport.serializeUser((user, callback) => {
-    serializeUser(user)
-      .then(serialized => callback(null, serialized))
-      .catch(error => callback(error))
-  })
-
-  passport.deserializeUser((serialized, callback) => {
-    deserializeUser(serialized)
-      .then(user => callback(null, user))
-      .catch(error => callback(error))
-  })
-
-  const initialize = () => [
-    cookieParser(),
-    session({
-      secret: 'n0rs4kjetrr5evarer',
-      resave: false,
-      saveUninitialized: false
-    }),
-    passport.initialize(),
-    passport.session()
-  ]
-
-  const onFailDefault = (req, res) => {
-    res.redirect('/login')
+  function initialize () {
+    return [
+      cookieParser(),
+      session({
+        secret: 'n0rs4kjetrr5evarer',
+        resave: false,
+        saveUninitialized: false
+      }),
+      passport.initialize(),
+      passport.session()
+    ]
   }
 
-  const login = (onFail = onFailDefault) => [
-    bodyParser.urlencoded({ extended: false }),
-    (req, res, next) => {
-      if (!req.body.username || !req.body.password) {
-        req.session.loginError = { message: 'Please provide a username and password to login' }
-        return onFail(req, res, next)
-      }
+  function errorRedirect () {
+    return (error, req, res) => {
+      res.redirect(req.query.errorRedirect || url.format({
+        pathname: req.path,
+        query: Object.assign({ error }, req.query)
+      }))
+    }
+  }
 
-      passport.authenticate('local', (error, user) => {
-        delete req.session.loginError
+  function successRedirect () {
+    return (req, res) => {
+      res.redirect(req.query.successRedirect || url.format({
+        pathname: req.path,
+        query: Object.assign({ success: true }, req.query)
+      }))
+    }
+  }
 
-        if (error) {
-          req.session.loginError = { message: error.message }
-          return onFail(req, res, next)
+  function login (handleError = errorRedirect()) {
+    return [
+      bodyParser.urlencoded({ extended: false }),
+      (req, res, next) => {
+        if (!req.body.username || !req.body.password) {
+          return handleError('missing-credentials', req, res, next)
         }
 
-        req.login(user, error => {
+        passport.authenticate('local', (error, user) => {
           if (error) {
-            req.session.loginError = { message: error.message }
-            return onFail(req, res, next)
+            return handleError('incorrect-credentials', req, res, next)
           }
 
-          req.session.user = req.session.passport.user
+          req.login(user, error => {
+            if (error) {
+              return handleError('login', req, res, next)
+            }
 
-          next()
-        })
-      })(req, res, next)
-    }
-  ]
+            req.session.user = req.session.passport.user
 
-  const logout = () => (req, res, next) => {
-    if (req.session) {
-      delete req.session.user
-    }
-
-    req.logout()
-    next()
+            next()
+          })
+        })(req, res, next)
+      }
+    ]
   }
 
-  const required = (onFail = onFailDefault) => (req, res, next) => {
-    if (req.isAuthenticated && req.isAuthenticated()) {
+  function logout () {
+    return function (req, res, next) {
+      if (req.session) {
+        delete req.session.user
+      }
+
+      req.logout()
+
       next()
-    } else {
-      onFail(req, res, next)
     }
   }
 
-  const api = () => {
+  function forgotPassword (handleError = errorRedirect()) {
+    return [
+      bodyParser.urlencoded({ extended: false }),
+      (req, res, next) => {
+        getUserEmail(req.body.username)
+          .then(email => {
+            if (!email) {
+              return handleError('no-user', req, res, next)
+            }
+
+            console.log('TODO: Send email to', email)
+
+            next()
+          })
+          .catch(error => {
+            return handleError('internal', req, res, next)
+          })
+      }
+    ]
+  }
+
+  function api () {
     const router = express.Router()
 
     router.use(initialize())
-
-    router.post('/login', login(), (req, res) => {
-      res.redirect(req.body.redirectTo || '/')
-    })
-
+    router.post('/login', login(), successRedirect())
+    router.post('/forgot-password', forgotPassword(), successRedirect())
     router.get('/logout', logout())
-
-    router.get('/authenticate', required(), (req, res) => {
-      res.status(200).end()
-    })
-
     router.get('/session', (req, res, next) => {
       res.status(200).json(req.session)
     })
@@ -130,7 +140,6 @@ module.exports = function ({
     initialize,
     login,
     logout,
-    required,
     api
   }
 }

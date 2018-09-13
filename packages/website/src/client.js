@@ -10,7 +10,7 @@ const navigate = router.listen((path = window.location.pathname) => {
     const route = routes[key || '404']({ params, session, query, navigate })
 
     if (route.authRequired && !session.user) {
-      return navigate(`/login?redirectTo=${window.location.pathname}`, { replace: true })
+      return navigate(`/login?successRedirect=${window.location.pathname}`, { replace: true })
     }
 
     document.title = route.title

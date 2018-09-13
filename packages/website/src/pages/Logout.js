@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import { Component } from 'react'
 
-export default class Login extends Component {
+export default class Logout extends Component {
   state = {
     error: null
   }

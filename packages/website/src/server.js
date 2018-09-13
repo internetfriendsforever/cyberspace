@@ -13,19 +13,9 @@ import styles from './styles.css'
 
 const app = express()
 
-const getUser = async username => ({
-  username: 'daniel'
-})
-
 const auth = userAuth({
-  getUser: getUser,
-
-  getPasswordHash: async username => (
-    '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum'
-  ),
-
-  serializeUser: async user => user.username,
-  deserializeUser: getUser
+  getPasswordHash: async username => '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum',
+  getUserEmail: async username => 'daniel@internetfriendsforever.com'
 })
 
 app.use(auth.api())
@@ -52,7 +42,7 @@ app.use((req, res) => {
   const route = routes[key || '404']({ params, session, query })
 
   if (route.authRequired && !session.user) {
-    return res.redirect(`/login?redirectTo=${req.path}`)
+    return res.redirect(`/login?successRedirect=${req.path}`)
   }
 
   res.status(route.statusCode || 200).send(`
