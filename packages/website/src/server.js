@@ -12,12 +12,21 @@ import styles from './styles.css'
 
 const app = express()
 
-const auth = userAuth({
+app.use(userAuth.api({
+  secret: 'sncjkel19284k3ismcnsu2o3i40s;ocs',
   getHash: async username => '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum',
-  getEmail: async username => 'daniel@internetfriendsforever.com'
-})
-
-app.use(auth.api())
+  setHash: async (username, hash) => console.log('Setting hash', username, hash),
+  getEmail: async username => 'daniel@internetfriendsforever.com',
+  smtp: null,
+  templates: {
+    requestToken: async ({ search }) => ({
+      from: 'test@test.com',
+      subject: 'Forgot password',
+      text: `Login using this link: http://localhost:3000/forgot-password${search}`,
+      html: `Login using <a href='http://localhost:3000/forgot-password${search}'>this link</a>`
+    })
+  }
+}))
 
 app.use('/static', express.static(path.join(__dirname, 'static'), {
   immutable: true,
@@ -37,10 +46,11 @@ const client = fs.readFileSync(path.join(__dirname, 'scripts/client'))
 
 app.use((req, res) => {
   const { session, query } = req
+  const authenticated = !!session.user
   const { key, params } = router.resolve(routes, req.path)
-  const route = routes[key || '404']({ params, session, query })
+  const route = routes[key || '404']({ params, authenticated, query })
 
-  if (route.authRequired && !session.user) {
+  if (route.authRequired && !authenticated) {
     return res.redirect(`/login?successRedirect=${req.path}`)
   }
 

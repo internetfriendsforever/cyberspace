@@ -6,6 +6,8 @@ import Category from './pages/Category'
 import Login from './pages/Login'
 import Logout from './pages/Logout'
 import ForgotPassword from './pages/ForgotPassword'
+import ChangePassword from './pages/ChangePassword'
+import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 
 export default {
@@ -46,11 +48,11 @@ export default {
     )
   }),
 
-  '/logout': ({ params, session, navigate }) => ({
-    title: `Login`,
+  '/logout': ({ params, authenticated, navigate }) => ({
+    title: `Logout`,
     component: (
       <Page>
-        <Logout user={session.user} navigate={navigate} />
+        <Logout authenticated={authenticated} navigate={navigate} />
       </Page>
     )
   }),
@@ -64,13 +66,22 @@ export default {
     )
   }),
 
-  '/profile': ({ params }) => ({
+  '/change-password': ({ query, navigate }) => ({
+    title: 'Forgot password',
+    authRequired: true,
+    component: (
+      <Page>
+        <ChangePassword query={query} navigate={navigate} />
+      </Page>
+    )
+  }),
+
+  '/profile': () => ({
     title: `Profile`,
     authRequired: true,
     component: (
       <Page>
-        <div>User profile</div>
-        <a href='/logout'>Logout</a>
+        <Profile />
       </Page>
     )
   }),

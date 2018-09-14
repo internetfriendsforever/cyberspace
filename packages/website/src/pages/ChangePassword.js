@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-export default class ForgotPassword extends Component {
+export default class ChangePassword extends Component {
   state = {
     error: this.props.query.error
   }
@@ -34,17 +34,11 @@ export default class ForgotPassword extends Component {
 
   getErrorMessage (code) {
     switch (code) {
-      case 'missing-user':
-        return 'Please enter a username'
+      case 'missing-passwords':
+        return 'Please enter both passwords'
 
-      case 'expired':
-        return 'The link has expired. Please try again'
-
-      case 'no-user':
-        return 'Could not find user'
-
-      case 'submit':
-        return 'Could not submit form. Connection issues?'
+      case 'incorrect-password':
+        return 'Incorrect old password'
 
       default:
         return 'An unknown error occurred. Please try again later'
@@ -52,21 +46,23 @@ export default class ForgotPassword extends Component {
   }
 
   render () {
-    if (this.props.query.success) {
+    const success = this.props.query.success
+    const error = this.state.error
+
+    if (success) {
       return (
-        <h2>An email has been sent with further instructions</h2>
+        <h2>Your password has been changed!</h2>
       )
     }
 
-    const validRedirect = this.props.query.validRedirect
-    const error = this.state.error
-    const action = `/forgot-password?validRedirect=${validRedirect}`
-
     return (
-      <form action={action} method='post' onSubmit={this.onSubmit}>
-        <h2>Forgot password</h2>
+      <form action={'/change-password'} method='post' onSubmit={this.onSubmit}>
+        <h2>Change password</h2>
+
         {error && <p>{this.getErrorMessage(error)}</p>}
-        <input type='text' name='username' placeholder='username' />
+
+        <input type='password' name='oldPassword' placeholder='Old password' />
+        <input type='password' name='newPassword' placeholder='New password' />
         <input type='submit' />
       </form>
     )
