@@ -15,6 +15,7 @@ const app = express()
 app.use(userAuth.api({
   secret: 'sncjkel19284k3ismcnsu2o3i40s;ocs',
   getHash: async username => '$2b$10$svkH.JkbqtjIfcwaYDWgGu8JS5HFsUjcNduOY9AkJEjEWjFMsnmum',
+  setHash: async (username, hash) => console.log('Setting hash', username, hash),
   getEmail: async username => 'daniel@internetfriendsforever.com',
   smtp: null,
   templates: {

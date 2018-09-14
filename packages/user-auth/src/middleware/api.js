@@ -4,10 +4,11 @@ const login = require('./login')
 const logout = require('./logout')
 const validateToken = require('./validateToken')
 const requestToken = require('./requestToken')
+const changePassword = require('./changePassword')
 const redirectError = require('./redirectError')
 const redirectSuccess = require('./redirectSuccess')
 
-module.exports = function api ({ secret, getHash, getEmail, smtp, templates = {} }) {
+module.exports = function api ({ secret, getHash, setHash, getEmail, smtp, templates = {} }) {
   const router = express.Router()
 
   router.use(initialize({
@@ -39,6 +40,13 @@ module.exports = function api ({ secret, getHash, getEmail, smtp, templates = {}
 
   router.get('/forgot-password', validateToken({
     secret,
+    handleError,
+    handleSuccess
+  }))
+
+  router.post('/change-password', changePassword({
+    getHash,
+    setHash,
     handleError,
     handleSuccess
   }))
