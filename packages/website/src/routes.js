@@ -46,11 +46,11 @@ export default {
     )
   }),
 
-  '/logout': ({ params, session, navigate }) => ({
-    title: `Login`,
+  '/logout': ({ params, authenticated, navigate }) => ({
+    title: `Logout`,
     component: (
       <Page>
-        <Logout user={session.user} navigate={navigate} />
+        <Logout authenticated={authenticated} navigate={navigate} />
       </Page>
     )
   }),

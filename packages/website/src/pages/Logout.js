@@ -6,7 +6,7 @@ export default class Logout extends Component {
   }
 
   componentDidMount () {
-    if (this.props.user) {
+    if (this.props.authenticated) {
       window.fetch('/logout').then(res => {
         this.props.navigate('/logout')
       }).catch(error => {
@@ -17,13 +17,13 @@ export default class Logout extends Component {
 
   render () {
     const { error } = this.state
-    const { user } = this.props
+    const { authenticated } = this.props
 
     if (error) {
       return `There was a problem logging you out: ${error.message}`
     }
 
-    if (user) {
+    if (authenticated) {
       return 'Logging out…'
     }
 
