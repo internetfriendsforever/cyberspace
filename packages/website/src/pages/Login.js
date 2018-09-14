@@ -51,15 +51,21 @@ export default class Login extends Component {
   render () {
     const successRedirect = this.props.query.successRedirect || '/profile'
     const error = this.state.error
+    const action = `/login?successRedirect=${successRedirect}`
 
     return (
-      <form action={`/login?successRedirect=${successRedirect}`} method='post' onSubmit={this.onSubmit}>
+      <form action={action} method='post' onSubmit={this.onSubmit}>
         <h2>Login</h2>
+
         {error && <p>{this.getErrorMessage(error)}</p>}
+
         <input type='text' name='username' placeholder='username' />
         <input type='password' name='password' placeholder='password' />
         <input type='submit' />
-        <a href='/forgot-password'>Forgot your password?</a>
+
+        <a href={`/forgot-password?validRedirect=${successRedirect}`}>
+          Forgot your password?
+        </a>
       </form>
     )
   }

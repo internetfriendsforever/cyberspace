@@ -52,17 +52,18 @@ export default class ForgotPassword extends Component {
   }
 
   render () {
-    const success = this.props.query.success
-    const error = this.state.error
-
-    if (success) {
+    if (this.props.query.success) {
       return (
         <h2>An email has been sent with further instructions</h2>
       )
     }
 
+    const validRedirect = this.props.query.validRedirect
+    const error = this.state.error
+    const action = `/forgot-password?validRedirect=${validRedirect}`
+
     return (
-      <form action='/forgot-password' method='post' onSubmit={this.onSubmit}>
+      <form action={action} method='post' onSubmit={this.onSubmit}>
         <h2>Forgot password</h2>
         {error && <p>{this.getErrorMessage(error)}</p>}
         <input type='text' name='username' placeholder='username' />

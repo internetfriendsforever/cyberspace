@@ -46,7 +46,7 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
   }
 
   function errorRedirect () {
-    return (errorCode, req, res, next) => {
+    return (req, res, next) => {
       const { errorRedirect, error } = req.query
 
       if (errorRedirect) {
@@ -92,6 +92,7 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
             return handleError('incorrect-credentials', req, res, next)
           }
 
+          // TODO: Clean up (the following is not DRY)
           req.login(user, error => {
             if (error) {
               return handleError('login', req, res, next)
@@ -140,8 +141,15 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
               expires: Date.now() + 1000 * 60 * 60
             }), secret)
 
+            const search = url.format({
+              query: {
+                token: token,
+                successRedirect: req.query.validRedirect
+              }
+            })
+
             return mail.templates.requestToken({
-              token: token
+              search: search
             }).then(template => (
               sendMail(mail.smtp, Object.assign({ to: email }, template))
             )).then(info => {
@@ -167,9 +175,10 @@ module.exports = function ({ getHash, getEmail, mail, secret }) {
     return function (req, res, next) {
       if (req.query.token && !req.query.success && !req.query.error) {
         try {
-          const { username, expires } = JSON.parse(readToken(req.query.token, secret))
+          const { username, expires, successRedirect } = JSON.parse(readToken(req.query.token, secret))
 
           if (Date.now() < expires) {
+            // TODO: Clean up (the following is not DRY)
             return req.login(username, error => {
               if (error) {
                 return handleError('internal', req, res, next)
@@ -265,3 +274,9 @@ function readToken (text, secret) {
   decrypted = Buffer.concat([decrypted, decipher.final()])
   return decrypted.toString()
 }
+
+// TODO:
+// - Use successRedirect from /login into /forgot-password
+// - Fix email ampersand problem?
+// - DRY in code (see comments above)
+// - Merge forgot-password branch

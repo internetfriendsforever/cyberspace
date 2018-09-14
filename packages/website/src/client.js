@@ -5,7 +5,7 @@ import routes from './routes'
 
 const navigate = router.listen((path = window.location.pathname) => {
   window.fetch('/session').then(res => res.json()).then(session => {
-    const query = queryString.parse(location.search)
+    const query = queryString.parse(window.location.search)
     const { key, params } = router.resolve(routes, path)
     const route = routes[key || '404']({ params, session, query, navigate })
 
