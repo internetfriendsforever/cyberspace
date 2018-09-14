@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/website",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "publishConfig": {
     "access": "public"
   },
@@ -16,11 +16,11 @@
     "clean": "rm -rf build"
   },
   "dependencies": {
-    "@cyberspace/basic-auth": "^0.0.2",
-    "@cyberspace/router": "^0.0.2",
-    "@cyberspace/user-auth": "^0.0.2",
-    "@cyberspace/webpack-config": "^0.0.2",
-    "@cyberspace/webpack-development": "^0.0.2",
+    "@cyberspace/basic-auth": "^0.1.0",
+    "@cyberspace/router": "^0.1.0",
+    "@cyberspace/user-auth": "^0.1.0",
+    "@cyberspace/webpack-config": "^0.1.0",
+    "@cyberspace/webpack-development": "^0.1.0",
     "emotion": "^9.2.8",
     "emotion-server": "^9.2.8",
     "express": "^4.16.3",
