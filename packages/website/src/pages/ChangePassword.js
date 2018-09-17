@@ -56,7 +56,7 @@ export default class ChangePassword extends Component {
     }
 
     return (
-      <form action={'/change-password'} method='post' onSubmit={this.onSubmit}>
+      <form action='' method='post' onSubmit={this.onSubmit}>
         <h2>Change password</h2>
 
         {error && <p>{this.getErrorMessage(error)}</p>}
