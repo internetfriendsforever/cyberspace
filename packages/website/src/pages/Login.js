@@ -51,7 +51,7 @@ export default class Login extends Component {
   render () {
     const successRedirect = this.props.query.successRedirect || '/profile'
     const error = this.state.error
-    const action = `?successRedirect=${successRedirect}`
+    const action = `/login?successRedirect=${successRedirect}`
 
     return (
       <form action={action} method='post' onSubmit={this.onSubmit}>

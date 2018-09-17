@@ -60,7 +60,7 @@ export default class ForgotPassword extends Component {
 
     const validRedirect = this.props.query.validRedirect
     const error = this.state.error
-    const action = `?validRedirect=${validRedirect}`
+    const action = `/forgot-password?validRedirect=${validRedirect}`
 
     return (
       <form action={action} method='post' onSubmit={this.onSubmit}>

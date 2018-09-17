@@ -15,22 +15,34 @@ module.exports = function changePassword ({ getHash, setHash, handleError, handl
         return handleError('requires-authentication', req, res, next)
       }
 
-      if (!oldPassword || !newPassword) {
-        return handleError('missing-passwords', req, res, next)
+      if (!newPassword) {
+        return handleError('missing-password', req, res, next)
+      }
+
+      const updateHash = () => bcrypt.hash(newPassword, saltRounds)
+        .then(hash => setHash(username, hash))
+        .then(() => handleSuccess(req, res, next))
+        .catch(error => {
+          handleError('internal', req, res, next)
+        })
+
+      if (req.session.authentication === 'email') {
+        return updateHash()
+      }
+
+      if (!oldPassword) {
+        return handleError('missing-password', req, res, next)
       }
 
       getHash(username)
         .then(hash => bcrypt.compare(oldPassword, hash))
         .then(isMatch => {
           if (isMatch) {
-            return bcrypt.hash(newPassword, saltRounds)
-              .then(hash => setHash(username, hash))
-              .then(() => handleSuccess(req, res, next))
+            updateHash()
           } else {
             handleError('incorrect-password', req, res, next)
           }
-        })
-        .catch(error => {
+        }).catch(error => {
           handleError('internal', req, res, next)
         })
     }

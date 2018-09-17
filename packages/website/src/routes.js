@@ -48,11 +48,11 @@ export default {
     )
   }),
 
-  '/logout': ({ params, authenticated, navigate }) => ({
+  '/logout': ({ params, authentication, navigate }) => ({
     title: `Logout`,
     component: (
       <Page>
-        <Logout authenticated={authenticated} navigate={navigate} />
+        <Logout authentication={authentication} navigate={navigate} />
       </Page>
     )
   }),
@@ -66,12 +66,12 @@ export default {
     )
   }),
 
-  '/change-password': ({ query, navigate }) => ({
+  '/change-password': ({ query, authentication, navigate }) => ({
     title: 'Forgot password',
     authRequired: true,
     component: (
       <Page>
-        <ChangePassword query={query} navigate={navigate} />
+        <ChangePassword authentication={authentication} query={query} navigate={navigate} />
       </Page>
     )
   }),

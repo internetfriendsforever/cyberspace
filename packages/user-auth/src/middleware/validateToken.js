@@ -8,6 +8,7 @@ module.exports = function validateToken ({ secret, handleError, handleSuccess })
 
         if (Date.now() < result.expires && result.username) {
           req.session.user = result.username
+          req.session.authentication = 'email'
           handleSuccess(req, res, next)
         } else {
           handleError('expired', req, res, next)
