@@ -32,17 +32,21 @@ module.exports = function requestToken ({ secret, getEmail, handleError, handleS
             })
           }
 
-          return template(templateParams).then(params => (
-            mail.send(smtp, Object.assign({ to: email }, params))
-          )).then(result => {
-            console.log('Message sent:', result.id)
+          return template(templateParams)
+            .then(params => (
+              mail.send(smtp, Object.assign({ to: email }, params))
+            ))
+            .then(result => {
+              console.log('Message sent:', result.id)
 
-            if (result.previewUrl) {
-              console.log('Preview:', result.previewUrl)
-            }
-          })
+              if (result.previewUrl) {
+                console.log('Preview:', result.previewUrl)
+              }
+            })
+            .then(() => {
+              handleSuccess(req, res, next)
+            })
         })
-        .then(() => handleSuccess(req, res, next))
         .catch(error => {
           console.error(error)
           return handleError('internal', req, res, next)
