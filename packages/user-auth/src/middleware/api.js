@@ -8,7 +8,24 @@ const changePassword = require('./changePassword')
 const redirectError = require('./redirectError')
 const redirectSuccess = require('./redirectSuccess')
 
-module.exports = function api ({ secret, getHash, setHash, getEmail, smtp, templates = {} }) {
+module.exports = function api ({ secret, getHash, setHash, getEmail, smtp, ...options }) {
+  const endpoints = Object.assign({
+    login: '/login',
+    logout: '/logout',
+    forgotPassword: '/forgot-password',
+    changePassword: '/change-password',
+    authenticated: '/authenticated'
+  }, options.endpoints)
+
+  const templates = Object.assign({
+    requestToken: async ({ query }) => ({
+      from: '[from]',
+      subject: '[subject]',
+      text: `[url]${query}`,
+      html: `<a href='[url]${query}'>this link</a>`
+    })
+  }, options.templates)
+
   const router = express.Router()
 
   router.use(initialize({
@@ -18,18 +35,18 @@ module.exports = function api ({ secret, getHash, setHash, getEmail, smtp, templ
   const handleError = redirectError()
   const handleSuccess = redirectSuccess()
 
-  router.post('/login', login({
+  router.post(endpoints.login, login({
     getHash,
     handleError,
     handleSuccess
   }))
 
-  router.get('/logout', logout({
+  router.get(endpoints.logout, logout({
     handleError,
     handleSuccess
   }))
 
-  router.post('/forgot-password', requestToken({
+  router.post(endpoints.forgotPassword, requestToken({
     secret,
     getEmail,
     handleError,
@@ -38,20 +55,20 @@ module.exports = function api ({ secret, getHash, setHash, getEmail, smtp, templ
     template: templates.requestToken
   }))
 
-  router.get('/forgot-password', validateToken({
+  router.get(endpoints.forgotPassword, validateToken({
     secret,
     handleError,
     handleSuccess
   }))
 
-  router.post('/change-password', changePassword({
+  router.post(endpoints.changePassword, changePassword({
     getHash,
     setHash,
     handleError,
     handleSuccess
   }))
 
-  router.get('/authenticated', (req, res, next) => {
+  router.get(endpoints.authenticated, (req, res, next) => {
     res.status(200).json(!!req.session.user)
   })
 
