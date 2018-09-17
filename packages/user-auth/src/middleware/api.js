@@ -14,7 +14,7 @@ module.exports = function api ({ secret, getHash, setHash, getEmail, smtp, ...op
     logout: '/logout',
     forgotPassword: '/forgot-password',
     changePassword: '/change-password',
-    authenticated: '/authenticated'
+    authentication: '/authentication'
   }, options.endpoints)
 
   const templates = Object.assign({
@@ -68,8 +68,8 @@ module.exports = function api ({ secret, getHash, setHash, getEmail, smtp, ...op
     handleSuccess
   }))
 
-  router.get(endpoints.authenticated, (req, res, next) => {
-    res.status(200).json(!!req.session.user)
+  router.get(endpoints.authentication, (req, res, next) => {
+    res.status(200).json(req.session.authentication || null)
   })
 
   return router

@@ -17,6 +17,7 @@ module.exports = function login ({ getHash, handleError, handleSuccess }) {
         .then(isMatch => {
           if (isMatch) {
             req.session.user = username
+            req.session.authentication = 'password'
             handleSuccess(req, res, next)
           } else {
             handleError('incorrect-credentials', req, res, next)

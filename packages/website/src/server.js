@@ -46,11 +46,11 @@ const client = fs.readFileSync(path.join(__dirname, 'scripts/client'))
 
 app.use((req, res) => {
   const { session, query } = req
-  const authenticated = !!session.user
+  const { authentication } = session
   const { key, params } = router.resolve(routes, req.path)
-  const route = routes[key || '404']({ params, authenticated, query })
+  const route = routes[key || '404']({ params, authentication, query })
 
-  if (route.authRequired && !authenticated) {
+  if (route.authRequired && !authentication) {
     return res.redirect(`/login?successRedirect=${req.path}`)
   }
 

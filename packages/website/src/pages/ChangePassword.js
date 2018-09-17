@@ -34,8 +34,8 @@ export default class ChangePassword extends Component {
 
   getErrorMessage (code) {
     switch (code) {
-      case 'missing-passwords':
-        return 'Please enter both passwords'
+      case 'missing-password':
+        return 'Passwords are required'
 
       case 'incorrect-password':
         return 'Incorrect old password'
@@ -46,6 +46,7 @@ export default class ChangePassword extends Component {
   }
 
   render () {
+    const authentication = this.props.authentication
     const success = this.props.query.success
     const error = this.state.error
 
@@ -56,13 +57,17 @@ export default class ChangePassword extends Component {
     }
 
     return (
-      <form action='' method='post' onSubmit={this.onSubmit}>
+      <form action='/change-password' method='post' onSubmit={this.onSubmit}>
         <h2>Change password</h2>
 
         {error && <p>{this.getErrorMessage(error)}</p>}
 
-        <input type='password' name='oldPassword' placeholder='Old password' />
+        {authentication !== 'email' && (
+          <input type='password' name='oldPassword' placeholder='Old password' />
+        )}
+
         <input type='password' name='newPassword' placeholder='New password' />
+
         <input type='submit' />
       </form>
     )
