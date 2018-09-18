@@ -32,8 +32,8 @@ module.exports = function api ({ secret, getHash, setHash, getEmail, smtp, ...op
     secret
   }))
 
-  const handleError = redirectError()
-  const handleSuccess = redirectSuccess()
+  const handleError = redirectError
+  const handleSuccess = redirectSuccess
 
   router.post(endpoints.login, login({
     getHash,
