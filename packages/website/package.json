@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/website",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publishConfig": {
     "access": "public"
   },
@@ -19,7 +19,7 @@
     "@cyberspace/basic-auth": "^0.3.0",
     "@cyberspace/router": "^0.3.0",
     "@cyberspace/user-auth": "^0.3.0",
-    "@cyberspace/webpack-config": "^0.3.0",
+    "@cyberspace/webpack-config": "^0.3.1",
     "@cyberspace/webpack-development": "^0.3.0",
     "emotion": "^9.2.8",
     "emotion-server": "^9.2.8",
