@@ -3,7 +3,7 @@ import queryString from 'query-string'
 import router from '@cyberspace/router'
 import routes from './routes'
 
-const navigate = router.listen((path = window.location.pathname) => {
+router.listen((path, navigate) => {
   window.fetch('/authentication').then(res => res.json()).then(authentication => {
     const query = queryString.parse(window.location.search)
     const { key, params } = router.resolve(routes, path)

@@ -26,13 +26,19 @@ module.exports = {
   },
 
   listen: (handler, { initial = true, pop = true, click = true } = {}) => {
+    function navigate (path, options = {}) {
+      const fn = options.replace ? 'replaceState' : 'pushState'
+      window.history[fn](null, null, path)
+      handler(window.location.pathname, navigate)
+    }
+
     if (initial) {
-      handler()
+      handler(window.location.pathname, navigate)
     }
 
     if (pop) {
       window.addEventListener('popstate', () => {
-        handler()
+        handler(window.location.pathname, navigate)
       })
     }
 
@@ -49,21 +55,13 @@ module.exports = {
           if (!external) {
             const { pathname, search = '', hash = '' } = link
             window.history.pushState(null, null, `${pathname}${search}${hash}`)
-            handler(pathname)
+            handler(pathname, navigate)
           } else {
             window.open(link.href)
           }
         }
       })
     }
-
-    const navigate = (path, options = {}) => {
-      const fn = options.replace ? 'replaceState' : 'pushState'
-      window.history[fn](null, null, path)
-      handler()
-    }
-
-    return navigate
   }
 }
 
