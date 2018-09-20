@@ -57,6 +57,8 @@ const rules = [
 ]
 
 const client = {
+  name: 'client',
+
   entry: [
     require.resolve('@babel/polyfill'),
     './src/client.js'
@@ -85,6 +87,8 @@ const client = {
 }
 
 const server = {
+  name: 'server',
+
   entry: [
     require.resolve('@babel/polyfill'),
     './src/server.js'

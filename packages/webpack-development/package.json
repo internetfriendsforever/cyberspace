@@ -10,8 +10,10 @@
   "license": "MIT",
   "main": "index.js",
   "dependencies": {
+    "friendly-errors-webpack-plugin": "^1.7.0",
     "minimist": "^1.2.0",
-    "webpack": "^4.17.2"
+    "webpack": "^4.17.2",
+    "webpackbar": "^2.6.3"
   },
   "bin": {
     "webpack-development": "index.js"
