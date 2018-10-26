@@ -25,10 +25,15 @@ module.exports = {
     return null
   },
 
-  listen: (handler, { initial = true, pop = true, click = true } = {}) => {
-    function navigate (path, options = {}) {
+  listen: (handler, { initial = true, pop = true, click = true, scroll = true } = {}) => {
+    function navigate (path, options = { scroll: true }) {
       const fn = options.replace ? 'replaceState' : 'pushState'
       window.history[fn](null, null, path)
+
+      if (options.scroll || scroll) {
+        window.scrollTo(0, 0)
+      }
+
       handler(window.location.pathname, navigate)
     }
 
@@ -45,8 +50,9 @@ module.exports = {
     if (click) {
       window.addEventListener('click', e => {
         const link = e.target.closest('a')
+        const ignore = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey
 
-        if (link) {
+        if (!ignore && link) {
           e.preventDefault()
 
           const domain = url => url.replace('http://', '').replace('https://', '').split('/')[0]
@@ -54,8 +60,7 @@ module.exports = {
 
           if (!external) {
             const { pathname, search = '', hash = '' } = link
-            window.history.pushState(null, null, `${pathname}${search}${hash}`)
-            handler(pathname, navigate)
+            navigate(`${pathname}${search}${hash}`)
           } else {
             window.open(link.href)
           }
