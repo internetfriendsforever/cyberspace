@@ -76,7 +76,9 @@ module.exports = {
           var external = domain(window.location.href) !== domain(link.href)
 
           if (!external) {
-            var { pathname, search = '', hash = '' } = link
+            var pathname = link.pathname
+            var search = link.search || ''
+            var hash = link.hash || ''
             navigate([pathname, search, hash].join(''))
           } else {
             window.open(link.href)
