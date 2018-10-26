@@ -40,6 +40,8 @@ module.exports = {
     var scroll = options.scroll || true
 
     function navigate (path, options) {
+      var options = options || {}
+
       var fn = options.replace ? 'replaceState' : 'pushState'
 
       window.history[fn](null, null, path)
