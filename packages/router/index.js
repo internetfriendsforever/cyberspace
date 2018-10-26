@@ -6,7 +6,7 @@ module.exports = {
 
     const path = normalize(rawPath)
 
-    const key = Object.keys(routes).find(function(pattern) {
+    const key = Object.keys(routes).find(function (pattern) {
       return pathToRegexp(pattern).test(path)
     })
 
@@ -23,18 +23,27 @@ module.exports = {
         })
       }
 
-      return { key, params }
+      return {
+        key: key,
+        params: params
+      }
     }
 
     return null
   },
 
-  listen: function (handler, { initial = true, pop = true, click = true, scroll = true } = {}) {
-    function navigate (path, options = { scroll: true }) {
+  listen: function (handler, options) {
+    const initial = options.initial || true
+    const pop = options.pop || true
+    const click = options.click || true
+    const scroll = options.scroll || true
+
+    function navigate (path, options) {
       const fn = options.replace ? 'replaceState' : 'pushState'
+
       window.history[fn](null, null, path)
 
-      if (options.scroll || scroll) {
+      if ((options && options.scroll) || scroll) {
         window.scrollTo(0, 0)
       }
 
@@ -52,7 +61,7 @@ module.exports = {
     }
 
     if (click) {
-      window.addEventListener('click', function(e) {
+      window.addEventListener('click', function (e) {
         const link = e.target.closest('a')
         const ignore = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey
 
@@ -67,7 +76,7 @@ module.exports = {
 
           if (!external) {
             const { pathname, search = '', hash = '' } = link
-            navigate(`${pathname}${search}${hash}`)
+            navigate([pathname, search, hash].join(''))
           } else {
             window.open(link.href)
           }
@@ -78,7 +87,8 @@ module.exports = {
 }
 
 function normalize (path) {
-  return `/${path.split('/').filter(function (value) {
-    return value
-  }).join('/')}`
+  return '/' + path
+    .split('/')
+    .filter(function (value) { return value })
+    .join('/')
 }
