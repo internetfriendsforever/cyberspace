@@ -1,22 +1,22 @@
-const pathToRegexp = require('path-to-regexp')
+var pathToRegexp = require('path-to-regexp')
 
 module.exports = {
   resolve: function (routes, rawPath) {
-    let keys = []
+    var keys = []
 
-    const path = normalize(rawPath)
+    var path = normalize(rawPath)
 
-    const key = Object.keys(routes).find(function (pattern) {
+    var key = Object.keys(routes).find(function (pattern) {
       return pathToRegexp(pattern).test(path)
     })
 
-    const route = routes[key] || routes['404']
+    var route = routes[key] || routes['404']
 
     if (route) {
-      const params = {}
+      var params = {}
 
       if (key) {
-        const values = pathToRegexp(key, keys).exec(path).slice(1)
+        var values = pathToRegexp(key, keys).exec(path).slice(1)
 
         keys.forEach(function (key, i) {
           params[key.name] = values[i]
@@ -33,13 +33,13 @@ module.exports = {
   },
 
   listen: function (handler, options) {
-    const initial = options.initial || true
-    const pop = options.pop || true
-    const click = options.click || true
-    const scroll = options.scroll || true
+    var initial = options.initial || true
+    var pop = options.pop || true
+    var click = options.click || true
+    var scroll = options.scroll || true
 
     function navigate (path, options) {
-      const fn = options.replace ? 'replaceState' : 'pushState'
+      var fn = options.replace ? 'replaceState' : 'pushState'
 
       window.history[fn](null, null, path)
 
@@ -62,20 +62,20 @@ module.exports = {
 
     if (click) {
       window.addEventListener('click', function (e) {
-        const link = e.target.closest('a')
-        const ignore = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey
+        var link = e.target.closest('a')
+        var ignore = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey
 
         if (!ignore && link) {
           e.preventDefault()
 
-          const domain = function (url) {
+          var domain = function (url) {
             return url.replace('http://', '').replace('https://', '').split('/')[0]
           }
 
-          const external = domain(window.location.href) !== domain(link.href)
+          var external = domain(window.location.href) !== domain(link.href)
 
           if (!external) {
-            const { pathname, search = '', hash = '' } = link
+            var { pathname, search = '', hash = '' } = link
             navigate([pathname, search, hash].join(''))
           } else {
             window.open(link.href)
