@@ -1,11 +1,15 @@
 const pathToRegexp = require('path-to-regexp')
 
 module.exports = {
-  resolve: (routes, rawPath) => {
+  resolve: function (routes, rawPath) {
     let keys = []
 
     const path = normalize(rawPath)
-    const key = Object.keys(routes).find(pattern => pathToRegexp(pattern).test(path))
+
+    const key = Object.keys(routes).find(function(pattern) {
+      return pathToRegexp(pattern).test(path)
+    })
+
     const route = routes[key] || routes['404']
 
     if (route) {
@@ -14,7 +18,7 @@ module.exports = {
       if (key) {
         const values = pathToRegexp(key, keys).exec(path).slice(1)
 
-        keys.forEach((key, i) => {
+        keys.forEach(function (key, i) {
           params[key.name] = values[i]
         })
       }
@@ -25,7 +29,7 @@ module.exports = {
     return null
   },
 
-  listen: (handler, { initial = true, pop = true, click = true, scroll = true } = {}) => {
+  listen: function (handler, { initial = true, pop = true, click = true, scroll = true } = {}) {
     function navigate (path, options = { scroll: true }) {
       const fn = options.replace ? 'replaceState' : 'pushState'
       window.history[fn](null, null, path)
@@ -42,20 +46,23 @@ module.exports = {
     }
 
     if (pop) {
-      window.addEventListener('popstate', () => {
+      window.addEventListener('popstate', function () {
         handler(window.location.pathname, navigate)
       })
     }
 
     if (click) {
-      window.addEventListener('click', e => {
+      window.addEventListener('click', function(e) {
         const link = e.target.closest('a')
         const ignore = e.ctrlKey || e.shiftKey || e.altKey || e.metaKey
 
         if (!ignore && link) {
           e.preventDefault()
 
-          const domain = url => url.replace('http://', '').replace('https://', '').split('/')[0]
+          const domain = function (url) {
+            return url.replace('http://', '').replace('https://', '').split('/')[0]
+          }
+
           const external = domain(window.location.href) !== domain(link.href)
 
           if (!external) {
@@ -71,5 +78,7 @@ module.exports = {
 }
 
 function normalize (path) {
-  return `/${path.split('/').filter(v => v).join('/')}`
+  return `/${path.split('/').filter(function (value) {
+    return value
+  }).join('/')}`
 }
