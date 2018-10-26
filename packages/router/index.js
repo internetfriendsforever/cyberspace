@@ -33,6 +33,7 @@ module.exports = {
   },
 
   listen: function (handler, options) {
+    var options = options || {}
     var initial = options.initial || true
     var pop = options.pop || true
     var click = options.click || true
