@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/website",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "publishConfig": {
     "access": "public"
   },
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@cyberspace/basic-auth": "^0.3.0",
-    "@cyberspace/router": "^0.3.11",
+    "@cyberspace/router": "^0.3.12",
     "@cyberspace/user-auth": "^0.3.4",
     "@cyberspace/webpack-config": "^0.3.4",
     "@cyberspace/webpack-development": "^0.3.6",
