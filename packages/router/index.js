@@ -34,10 +34,10 @@ module.exports = {
 
   listen: function (handler, options) {
     var options = options || {}
-    var initial = options.initial || true
-    var pop = options.pop || true
-    var click = options.click || true
-    var scroll = options.scroll || true
+    var initial = options.initial === true || false
+    var pop = options.pop === true || false
+    var click = options.click === true || false
+    var scroll = options.scroll === true || false
 
     function navigate (path, options) {
       var options = options || {}
