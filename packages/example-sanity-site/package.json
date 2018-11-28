@@ -1,8 +1,8 @@
 {
-  "name": "norske-trevarer",
+  "name": "@cyberspace/example-sanity-site",
   "version": "0.0.1",
-  "description": "Norske Trevarer website",
-  "repository": "https://github.com/internetfriendsforever/norske-trevarer-website",
+  "description": "Cyberspace example sanity site",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/example-sanity-site",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
   "license": "MIT",
   "scripts": {
