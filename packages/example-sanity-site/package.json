@@ -1,6 +1,9 @@
 {
   "name": "@cyberspace/example-sanity-site",
   "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Cyberspace example sanity site",
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/example-sanity-site",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
