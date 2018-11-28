@@ -1,0 +1,15 @@
+{
+  "name": "@cyberspace/api-client",
+  "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "API client with caching",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/api-client",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "isomorphic-fetch": "^2.2.1"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "@cyberspace/example-sanity-site",
+  "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Cyberspace example sanity site",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/example-sanity-site",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "scripts": {
+    "deploy": "now --regions bru --env NODE_ENV=\"production\"",
+    "build": "webpack --config node_modules/@cyberspace/webpack-config --mode=production",
+    "start": "node build/server.js",
+    "dev": "webpack-development --config node_modules/@cyberspace/webpack-config --exec 'node -r dotenv/config build/server'",
+    "clean": "rm -rf build"
+  },
+  "dependencies": {
+    "@cyberspace/api-client": "^0.0.1",
+    "@cyberspace/router": "^0.3.11",
+    "@cyberspace/webpack-config": "^0.3.4",
+    "@cyberspace/webpack-development": "^0.3.4",
+    "@sanity/block-content-to-react": "^2.0.5",
+    "@sanity/client": "^0.132.10",
+    "@sanity/image-url": "^0.132.8",
+    "emotion": "^9.2.8",
+    "emotion-server": "^9.2.8",
+    "express": "^4.16.3",
+    "query-string": "^5.1.1",
+    "react": "^16.5.0",
+    "react-dom": "^16.5.0",
+    "react-emotion": "^9.2.8",
+    "webpack": "^4.17.2",
+    "webpack-cli": "^3.1.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^9.0.0",
+    "dotenv": "^6.0.0",
+    "eslint": "^5.5.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-config-standard-jsx": "^6.0.2",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-react": "^7.11.1",
+    "eslint-plugin-standard": "^4.0.0"
+  }
+}
