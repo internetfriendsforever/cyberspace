@@ -32,16 +32,13 @@ module.exports = {
     return null
   },
 
-  listen: function (handler, options) {
-    var options = options || {}
-    var initial = options.initial === true || false
-    var pop = options.pop === true || false
-    var click = options.click === true || false
-    var scroll = options.scroll === true || false
-
-    function navigate (path, options) {
-      var options = options || {}
-
+  listen: function (handler, {
+    initial = true,
+    pop = true,
+    click = true,
+    scroll = true
+  } = {}) {
+    function navigate (path, options = {}) {
       var fn = options.replace ? 'replaceState' : 'pushState'
 
       window.history[fn](null, null, path)
