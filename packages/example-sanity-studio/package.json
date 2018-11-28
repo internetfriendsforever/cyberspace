@@ -1,9 +1,7 @@
 {
   "name": "@cyberspace/example-sanity-studio",
   "version": "0.0.1",
-  "publishConfig": {
-    "access": "public"
-  },
+  "private": true,
   "description": "",
   "main": "package.json",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
