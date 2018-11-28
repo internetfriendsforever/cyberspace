@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/example-sanity-site",
-  "version": "0.0.1",
+  "version": "0.3.14",
   "private": true,
   "description": "Cyberspace example sanity site",
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/example-sanity-site",
@@ -14,10 +14,10 @@
     "clean": "rm -rf build"
   },
   "dependencies": {
-    "@cyberspace/api-client": "^0.0.1",
-    "@cyberspace/router": "^0.3.11",
-    "@cyberspace/webpack-config": "^0.3.4",
-    "@cyberspace/webpack-development": "^0.3.4",
+    "@cyberspace/api-client": "^0.3.14",
+    "@cyberspace/router": "^0.3.14",
+    "@cyberspace/webpack-config": "^0.3.14",
+    "@cyberspace/webpack-development": "^0.3.14",
     "@sanity/block-content-to-react": "^2.0.5",
     "@sanity/client": "^0.132.10",
     "@sanity/image-url": "^0.132.8",

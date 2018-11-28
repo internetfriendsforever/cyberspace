@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/example-sanity-studio",
-  "version": "0.0.1",
+  "version": "0.3.14",
   "private": true,
   "description": "",
   "main": "package.json",
@@ -23,6 +23,5 @@
     "prop-types": "^15.6",
     "react": "^16.2",
     "react-dom": "^16.2"
-  },
-  "devDependencies": {}
+  }
 }
