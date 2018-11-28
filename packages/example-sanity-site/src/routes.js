@@ -1,7 +1,7 @@
 import React from 'react'
 import Layout from './components/Layout'
-import Page from './pages/Page'
-import NotFound from './pages/NotFound'
+import Page from './components/Page'
+import NotFound from './components/NotFound'
 
 const site = {
   name: 'Jack’s Wooly Jumpers Limited'
