@@ -1,7 +1,7 @@
 import { hydrate } from 'react-dom'
 import queryString from 'query-string'
 import router from '@cyberspace/router'
-import apiClient from './api/client'
+import apiClient from '@cyberspace/api-client'
 import routes from './routes'
 
 const api = apiClient('/api')()

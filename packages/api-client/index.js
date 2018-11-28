@@ -1,8 +1,8 @@
-import fetch from 'isomorphic-fetch'
+const fetch = require('isomorphic-fetch')
 
 const cache = {}
 
-export default (endpoint = '') => {
+module.exports = (endpoint = '') => {
   return options => {
     const pool = {}
 
@@ -44,14 +44,12 @@ export default (endpoint = '') => {
       },
 
       dehydrate: () => {
-        return Buffer.from(JSON.stringify(pool)).toString('base64')
+        return JSON.stringify(pool)
       },
 
       hydrate: (dehydrated) => {
-        const parsed = JSON.parse(Buffer.from(dehydrated, 'base64').toString())
-
-        for (let key in parsed) {
-          cache[key] = parsed[key]
+        for (let key in dehydrated) {
+          cache[key] = dehydrated[key]
         }
       }
     }
