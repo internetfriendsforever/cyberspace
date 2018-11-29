@@ -64,5 +64,5 @@ app.use(async (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log('Server listening at port', port)
+  console.log('Server listening at port', port, url)
 })

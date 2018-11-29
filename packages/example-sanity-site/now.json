@@ -1,4 +1,5 @@
 {
+  "version": 1,
   "env": {
     "SANITY_TOKEN": "@cyberspace-example-sanity-token"
   }
