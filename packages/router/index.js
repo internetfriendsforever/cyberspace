@@ -73,7 +73,10 @@ module.exports = {
             const pathname = link.pathname
             const search = link.search || ''
             const hash = link.hash || ''
-            navigate([pathname, search, hash].join(''))
+            const replace = link.hasAttribute('data-replace')
+            const scroll = link.getAttribute('data-scroll') !== 'false'
+            const options = { replace, scroll }
+            navigate([pathname, search, hash].join(''), options)
           } else {
             window.open(link.href)
           }
