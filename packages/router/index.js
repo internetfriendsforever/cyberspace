@@ -9,8 +9,6 @@ module.exports = {
       return pathToRegexp(pattern).test(path)
     })
 
-    const route = routes[key]
-
     if (key) {
       const paramKeys = []
 
@@ -38,7 +36,7 @@ module.exports = {
 
       window.history[fn](null, null, path)
 
-      if ((options && options.scroll) || scroll) {
+      if ((options && options.scroll) || (!options && scroll)) {
         window.scrollTo(0, 0)
       }
 
