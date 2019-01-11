@@ -36,7 +36,9 @@ module.exports = {
 
       window.history[fn](null, null, path)
 
-      if ((options && options.scroll) || (!options && scroll)) {
+      const scrollOption = 'scroll' in options ? options.scroll : scroll
+
+      if (scrollOption) {
         window.scrollTo(0, 0)
       }
 
