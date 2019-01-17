@@ -21,8 +21,6 @@ function extend (config, i) {
   config.plugins.push(new WebpackBar({
     name: config.name || i
   }))
-
-  config.plugins.push(new FriendlyErrorsWebpackPlugin())
 }
 
 if (Array.isArray(config)) {
@@ -32,6 +30,8 @@ if (Array.isArray(config)) {
 }
 
 const compiler = webpack(config)
+
+compiler.apply(new FriendlyErrorsWebpackPlugin())
 
 let childProcess
 
