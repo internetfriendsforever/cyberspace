@@ -56,65 +56,80 @@ const rules = [
   }
 ]
 
-const client = {
-  name: 'client',
+const configs = []
 
-  entry: [
-    require.resolve('@babel/polyfill'),
-    './src/client.js'
-  ],
+const clientEntry = gracefulResolve(path.join(process.cwd(), 'src/client'))
 
-  target: 'web',
+if (clientEntry) {
+  configs.push({
+    name: 'client',
 
-  output: {
-    path: path.join(process.cwd(), 'build'),
-    filename: 'static/client-[hash].js',
-    publicPath: '/'
-  },
+    entry: [
+      require.resolve('@babel/polyfill'),
+      clientEntry
+    ],
 
-  module: {
-    rules
-  },
+    target: 'web',
 
-  plugins: [
-    new StatsWriterPlugin({
-      filename: 'scripts/client',
-      transform (data) {
-        return data.assetsByChunkName.main
-      }
-    })
-  ]
+    output: {
+      path: path.join(process.cwd(), 'build'),
+      filename: 'static/client-[hash].js',
+      publicPath: '/'
+    },
+
+    module: {
+      rules
+    },
+
+    plugins: [
+      new StatsWriterPlugin({
+        filename: 'scripts/client',
+        transform (data) {
+          return data.assetsByChunkName.main
+        }
+      })
+    ]
+  })
 }
 
-const server = {
-  name: 'server',
+const serverEntry = gracefulResolve(path.join(process.cwd(), 'src/server'))
 
-  entry: [
-    require.resolve('@babel/polyfill'),
-    './src/server.js'
-  ],
+if (serverEntry) {
+  configs.push({
+    name: 'server',
 
-  target: 'node',
+    entry: [
+      require.resolve('@babel/polyfill'),
+      serverEntry
+    ],
 
-  node: {
-    __dirname: false,
-    __filename: false
-  },
+    target: 'node',
 
-  externals: [nodeExternals()],
+    node: {
+      __dirname: false,
+      __filename: false
+    },
 
-  output: {
-    path: path.join(process.cwd(), 'build'),
-    filename: 'server.js',
-    publicPath: '/'
-  },
+    externals: [nodeExternals()],
 
-  module: {
-    rules
+    output: {
+      path: path.join(process.cwd(), 'build'),
+      filename: 'server.js',
+      publicPath: '/'
+    },
+
+    module: {
+      rules
+    }
+  })
+}
+
+function gracefulResolve (path) {
+  try {
+    return require.resolve(path)
+  } catch (error) {
+    console.log('Could not resolve', path)
   }
 }
 
-module.exports = [
-  server,
-  client
-]
+module.exports = configs
