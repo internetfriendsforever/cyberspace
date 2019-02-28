@@ -34,7 +34,7 @@ module.exports = {
     function navigate (path, options = {}) {
       const fn = options.replace ? 'replaceState' : 'pushState'
 
-      window.history[fn](null, null, path)
+      window.history[fn](options.state || null, null, path)
 
       const scrollOption = 'scroll' in options ? options.scroll : scroll
 
