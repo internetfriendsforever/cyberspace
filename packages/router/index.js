@@ -42,7 +42,7 @@ module.exports = {
         window.scrollTo(0, 0)
       }
 
-      handler(window.location.pathname, navigate)
+      return handler(window.location.pathname, navigate)
     }
 
     if (initial) {
