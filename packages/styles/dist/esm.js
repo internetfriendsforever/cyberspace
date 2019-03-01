@@ -1760,4 +1760,6 @@ Styles.prototype.toString = function () {
   return css.join('\n')
 };
 
-export default Styles;
+var index = new Styles();
+
+export default index;

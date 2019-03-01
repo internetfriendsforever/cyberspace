@@ -16,15 +16,13 @@
   "dependencies": {
     "@cyberspace/api-client": "^0.3.27",
     "@cyberspace/router": "^0.3.27",
+    "@cyberspace/styles": "^0.3.18",
     "@cyberspace/webpack-config": "^0.3.28",
     "@cyberspace/webpack-development": "^0.3.24",
-    "emotion": "^9.2.8",
-    "emotion-server": "^9.2.8",
     "express": "^4.16.3",
     "query-string": "^5.1.1",
     "react": "^16.5.0",
     "react-dom": "^16.5.0",
-    "react-emotion": "^9.2.8",
     "webpack": "^4.17.2",
     "webpack-cli": "^3.1.0"
   },

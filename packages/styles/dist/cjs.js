@@ -1762,4 +1762,6 @@ Styles.prototype.toString = function () {
   return css.join('\n')
 };
 
-module.exports = Styles;
+var index = new Styles();
+
+module.exports = index;

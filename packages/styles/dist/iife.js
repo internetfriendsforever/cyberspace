@@ -1764,6 +1764,8 @@ this.cyberspace.css = (function () {
 	  return css.join('\n')
 	};
 
-	return Styles;
+	var index = new Styles();
+
+	return index;
 
 }());
