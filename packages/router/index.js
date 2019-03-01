@@ -36,13 +36,13 @@ module.exports = {
 
       window.history[fn](options.state || null, null, path)
 
-      const scrollOption = 'scroll' in options ? options.scroll : scroll
+      const render = handler(window.location.pathname, navigate)
 
-      if (scrollOption) {
-        window.scrollTo(0, 0)
-      }
-
-      return handler(window.location.pathname, navigate)
+      Promise.resolve(render).then(() => {
+        if ('scroll' in options ? options.scroll : scroll) {
+          window.scrollTo(0, 0)
+        }
+      })
     }
 
     if (initial) {
