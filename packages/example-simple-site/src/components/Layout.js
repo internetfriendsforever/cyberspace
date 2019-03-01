@@ -12,7 +12,7 @@ injectGlobal`
   }
 `
 
-export default function Layout ({ path, user, site, children }) {
+export default function Layout ({ path, site, children }) {
   return (
     <Fragment>
       <Navigation site={site} path={path} />

@@ -1,0 +1,28 @@
+{
+  "name": "@cyberspace/styles",
+  "version": "0.3.18",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "CSS in JavaScript using template literals and stylis (node.js and browser)",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/css",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "main": "dist/cjs.js",
+  "module": "dist/esm.js",
+  "files": [
+    "dist/iife.js"
+  ],
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "rollup -c",
+    "dev": "rollup -c -w & http-server -c-1"
+  },
+  "devDependencies": {
+    "stylis": "^3.5.3",
+    "http-server": "^0.11.1",
+    "rollup": "^0.66.6",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^3.4.0"
+  }
+}
