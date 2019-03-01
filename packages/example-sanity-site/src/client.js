@@ -14,8 +14,12 @@ router.listen(async (path, navigate) => {
   try {
     const { key, params } = router.resolve(routes, path)
     const route = await routes[key || '404']({ path, params, query, navigate, api })
+
     document.title = route.title
-    hydrate(route.component, document.getElementById('root'))
+
+    await new Promise(resolve => {
+      hydrate(route.component, document.getElementById('root'), resolve)
+    })
   } catch (error) {
     console.log(error)
   }
