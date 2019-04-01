@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/example-simple-site",
-  "version": "0.3.23",
+  "version": "0.3.24",
   "private": true,
   "description": "Cyberspace example simple site",
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/example-simple-site",
@@ -14,10 +14,10 @@
     "clean": "rm -rf build"
   },
   "dependencies": {
-    "@cyberspace/api-client": "^0.3.18",
-    "@cyberspace/router": "^0.3.23",
-    "@cyberspace/webpack-config": "^0.3.19",
-    "@cyberspace/webpack-development": "^0.3.19",
+    "@cyberspace/api-client": "^0.3.24",
+    "@cyberspace/router": "^0.3.24",
+    "@cyberspace/webpack-config": "^0.3.24",
+    "@cyberspace/webpack-development": "^0.3.24",
     "emotion": "^9.2.8",
     "emotion-server": "^9.2.8",
     "express": "^4.16.3",

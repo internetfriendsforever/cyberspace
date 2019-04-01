@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/webpack-config",
-  "version": "0.3.19",
+  "version": "0.3.24",
   "publishConfig": {
     "access": "public"
   },

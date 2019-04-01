@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/api-client",
-  "version": "0.3.18",
+  "version": "0.3.24",
   "publishConfig": {
     "access": "public"
   },
