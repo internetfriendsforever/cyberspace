@@ -24,6 +24,9 @@ export default {
       component: (
         <Layout path={path}>
           <h1>About Jack’s Wooly Jumpers</h1>
+          <p>
+            The jumpers are made in Oslo by <a href='https://internetfriendsforever.com'>internetfriendsforever</a> (external link)
+          </p>
         </Layout>
       )
     }
