@@ -70,8 +70,11 @@ module.exports = {
           }
 
           const external = domain(window.location.href) !== domain(link.href)
+          const blank = link.target === '_blank'
 
-          if (!external) {
+          if (blank || external) {
+            window.open(link.href)
+          } else {
             const pathname = link.pathname
             const search = link.search || ''
             const hash = link.hash || ''
@@ -79,8 +82,6 @@ module.exports = {
             const scroll = link.getAttribute('data-scroll') !== 'false'
             const options = { replace, scroll }
             navigate([pathname, search, hash].join(''), options)
-          } else {
-            window.open(link.href)
           }
         }
       })
