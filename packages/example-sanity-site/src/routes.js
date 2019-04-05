@@ -33,6 +33,8 @@ export default {
   '/sweaters': async ({ api, path }) => {
     const page = await api.get(`/page/sweaters`)
 
+    console.log(page)
+
     return {
       title: `${page.title} – ${site.name}`,
       component: (
