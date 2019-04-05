@@ -4,7 +4,7 @@ import router from '@cyberspace/router'
 import createApiClient from '@cyberspace/api-client'
 import routes from './routes'
 
-const api = createApiClient('/api')
+const api = createApiClient('/api')()
 
 api.hydrate(window.dehydrated)
 

@@ -4,65 +4,68 @@ const cache = {}
 
 module.exports = function (endpoint, options) {
   endpoint = endpoint || ''
-  options = options || {}
 
-  const pool = {}
+  return function (options) {
+    options = options || {}
 
-  return {
-    invalidate: function (key) {
-      delete cache[key]
-    },
+    const pool = {}
 
-    flush: function () {
-      for (let key in cache) {
+    return {
+      invalidate: function (key) {
         delete cache[key]
-      }
-    },
+      },
 
-    get: function (path, cacheOptions) {
-      cacheOptions = cacheOptions || {}
-
-      return new Promise(function(resolve, reject) {
-        const key = cacheOptions.key || path
-        const miss = cache[key] === undefined || cache[key].expires < Date.now()
-        const ignore = cacheOptions.cache === false
-
-        if (miss || ignore) {
-          const expires = Date.now() + (cacheOptions.expires || 1000 * 60 * 60 * 24)
-
-          return fetch(endpoint + path, options)
-            .then(function (res) {
-              return res.json()
-            })
-            .then(function (result) {
-              pool[key] = {
-                result: result,
-                expires: expires
-              }
-
-              if (ignore) {
-                resolve(result)
-              } else {
-                cache[key] = { result, expires }
-                pool[key] = cache[key]
-                resolve(cache[key].result)
-              }
-            })
-            .catch(reject)
+      flush: function () {
+        for (let key in cache) {
+          delete cache[key]
         }
+      },
 
-        pool[key] = cache[key]
-        resolve(cache[key].result)
-      })
-    },
+      get: function (path, cacheOptions) {
+        cacheOptions = cacheOptions || {}
 
-    dehydrate: function () {
-      return JSON.stringify(pool)
-    },
+        return new Promise(function(resolve, reject) {
+          const key = cacheOptions.key || path
+          const miss = cache[key] === undefined || cache[key].expires < Date.now()
+          const ignore = cacheOptions.cache === false
 
-    hydrate: function (dehydrated) {
-      for (let key in dehydrated) {
-        cache[key] = dehydrated[key]
+          if (miss || ignore) {
+            const expires = Date.now() + (cacheOptions.expires || 1000 * 60 * 60 * 24)
+
+            return fetch(endpoint + path, options)
+              .then(function (res) {
+                return res.json()
+              })
+              .then(function (result) {
+                pool[key] = {
+                  result: result,
+                  expires: expires
+                }
+
+                if (ignore) {
+                  resolve(result)
+                } else {
+                  cache[key] = { result, expires }
+                  pool[key] = cache[key]
+                  resolve(cache[key].result)
+                }
+              })
+              .catch(reject)
+          }
+
+          pool[key] = cache[key]
+          resolve(cache[key].result)
+        })
+      },
+
+      dehydrate: function () {
+        return JSON.stringify(pool)
+      },
+
+      hydrate: function (dehydrated) {
+        for (let key in dehydrated) {
+          cache[key] = dehydrated[key]
+        }
       }
     }
   }
