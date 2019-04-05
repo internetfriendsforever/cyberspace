@@ -1,7 +1,7 @@
 const pathToRegexp = require('path-to-regexp')
 
 module.exports = {
-  resolve: function (routes, rawPath) {
+  resolve (routes, rawPath) {
     const params = {}
     const path = normalize(rawPath)
 
@@ -25,7 +25,7 @@ module.exports = {
     }
   },
 
-  listen: function (handler, {
+  listen (handler, {
     initial = true,
     pop = true,
     click = true,

@@ -8,8 +8,16 @@
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/api-client",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
   "license": "MIT",
-  "main": "index.js",
+  "main": "index.cjs.js",
+  "scripts": {
+    "build": "babel index.js --presets=@babel/preset-env --out-file index.cjs.js"
+  },
   "dependencies": {
     "isomorphic-fetch": "^2.2.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3"
   }
 }

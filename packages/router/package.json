@@ -8,7 +8,16 @@
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/router",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
   "license": "MIT",
+  "main": "index.cjs.js",
+  "scripts": {
+    "build": "babel index.js --presets=@babel/preset-env --out-file index.cjs.js"
+  },
   "dependencies": {
     "path-to-regexp": "^2.4.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3"
   }
 }

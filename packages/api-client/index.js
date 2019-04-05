@@ -2,71 +2,52 @@ const fetch = require('isomorphic-fetch')
 
 const cache = {}
 
-module.exports = function (endpoint, options) {
-  endpoint = endpoint || ''
-
-  return function (options) {
-    options = options || {}
-
+module.exports = (endpoint = '') => {
+  return options => {
     const pool = {}
 
     return {
-      invalidate: function (key) {
+      invalidate: key => {
         delete cache[key]
       },
 
-      flush: function () {
+      flush: () => {
         for (let key in cache) {
           delete cache[key]
         }
       },
 
-      get: function (path, cacheOptions) {
-        cacheOptions = cacheOptions || {}
+      get: async (path, cacheOptions = {}) => {
+        const key = cacheOptions.key || path
+        const miss = cache[key] === undefined || cache[key].expires < Date.now()
+        const ignore = cacheOptions.cache === false
 
-        return new Promise(function(resolve, reject) {
-          const key = cacheOptions.key || path
-          const miss = cache[key] === undefined || cache[key].expires < Date.now()
-          const ignore = cacheOptions.cache === false
+        if (miss || ignore) {
+          const expires = Date.now() + (cacheOptions.expires || 1000 * 60 * 60 * 24)
 
-          if (miss || ignore) {
-            const expires = Date.now() + (cacheOptions.expires || 1000 * 60 * 60 * 24)
+          const result = await fetch(`${endpoint}${path}`, options)
+            .then(res => res.json())
+            .catch(console.error)
 
-            return fetch(endpoint + path, options)
-              .then(function (res) {
-                return res.json()
-              })
-              .then(function (result) {
-                pool[key] = {
-                  result: result,
-                  expires: expires
-                }
+          pool[key] = { result, expires }
 
-                if (ignore) {
-                  resolve(result)
-                } else {
-                  cache[key] = {
-                    result: result,
-                    expires: expires
-                  }
-
-                  pool[key] = cache[key]
-                  resolve(cache[key].result)
-                }
-              })
-              .catch(reject)
+          if (ignore) {
+            return result
+          } else {
+            cache[key] = { result, expires }
           }
+        }
 
-          pool[key] = cache[key]
-          resolve(cache[key].result)
-        })
+        pool[key] = cache[key]
+
+        return cache[key].result
       },
 
-      dehydrate: function () {
+      dehydrate: () => {
         return JSON.stringify(pool)
       },
 
-      hydrate: function (dehydrated) {
+      hydrate: (dehydrated) => {
         for (let key in dehydrated) {
           cache[key] = dehydrated[key]
         }
