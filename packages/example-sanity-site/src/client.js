@@ -1,10 +1,10 @@
 import { hydrate } from 'react-dom'
 import queryString from 'query-string'
 import router from '@cyberspace/router'
-import apiClient from '@cyberspace/api-client'
+import createApiClient from '@cyberspace/api-client'
 import routes from './routes'
 
-const api = apiClient('/api')()
+const api = createApiClient('/api')
 
 api.hydrate(window.dehydrated)
 

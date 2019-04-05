@@ -15,7 +15,7 @@ const port = 3001
 const url = process.env.NOW_URL || `http://localhost:${port}`
 const apiPath = '/api'
 const apiUrl = `${url}${apiPath}`
-const apiClient = createApiClient(apiUrl)()
+const apiClient = createApiClient(apiUrl)
 
 app.use('/static', express.static(path.join(__dirname, 'static'), {
   immutable: true,
