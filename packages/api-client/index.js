@@ -45,7 +45,11 @@ module.exports = function (endpoint, options) {
                 if (ignore) {
                   resolve(result)
                 } else {
-                  cache[key] = { result, expires }
+                  cache[key] = {
+                    result: result,
+                    expires: expires
+                  }
+
                   pool[key] = cache[key]
                   resolve(cache[key].result)
                 }
