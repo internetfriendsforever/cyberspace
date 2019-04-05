@@ -31,7 +31,9 @@ module.exports = function (endpoint, options) {
           const expires = Date.now() + (cacheOptions.expires || 1000 * 60 * 60 * 24)
 
           return fetch(endpoint + path, options)
-            .then(res => res.json())
+            .then(function (res) {
+              return res.json()
+            })
             .then(function (result) {
               pool[key] = {
                 result: result,
