@@ -1,6 +1,5 @@
-import fs from 'fs'
-import path from 'path'
 import express from 'express'
+import bundle from '@cyberspace/webpack-config/bundle'
 import router from '@cyberspace/router'
 import { renderToString } from 'react-dom/server'
 import { renderStylesToString } from 'emotion-server'
@@ -11,12 +10,7 @@ const app = express()
 
 const port = 3001
 
-app.use('/static', express.static(path.join(__dirname, 'static'), {
-  immutable: true,
-  maxAge: '1y'
-}))
-
-const client = fs.readFileSync(path.join(__dirname, 'scripts/client'))
+app.use('/static', bundle)
 
 app.use(async (req, res) => {
   try {
@@ -39,7 +33,7 @@ app.use(async (req, res) => {
           </head>
           <body>
             <div id='root'>${renderStylesToString(renderToString(route.component))}</div>
-            <script src='/${client}'></script>
+            <script src='/static/client.js'></script>
           </body>
         </html>
       `)

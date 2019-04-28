@@ -1,6 +1,5 @@
-import fs from 'fs'
-import path from 'path'
 import express from 'express'
+import bundle from '@cyberspace/webpack-config/bundle'
 import router from '@cyberspace/router'
 import createApiClient from '@cyberspace/api-client'
 import { renderToString } from 'react-dom/server'
@@ -17,12 +16,7 @@ const apiPath = '/api'
 const apiUrl = `${url}${apiPath}`
 const apiClient = createApiClient(apiUrl)()
 
-app.use('/static', express.static(path.join(__dirname, 'static'), {
-  immutable: true,
-  maxAge: '1y'
-}))
-
-const client = fs.readFileSync(path.join(__dirname, 'scripts/client'))
+app.use('/static', bundle)
 
 app.use(apiPath, apiMiddleware)
 
@@ -53,7 +47,7 @@ app.use(async (req, res) => {
           <body>
             <div id='root'>${renderStylesToString(renderToString(route.component))}</div>
             <script>window.dehydrated = ${apiClient.dehydrate()};</script>
-            <script src='/${client}'></script>
+            <script src='/static/client.js'></script>
           </body>
         </html>
       `)
