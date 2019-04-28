@@ -30,10 +30,6 @@ app.use(async (req, res) => {
             <meta name='theme-color' content='#000' />
             <link rel='icon' type='image/png' href='${favicon}'>
             <style>
-              * {
-                box-sizing: border-box;
-              }
-
               body {
                 background: lightyellow;
               }
