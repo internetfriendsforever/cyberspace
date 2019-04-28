@@ -1,5 +1,6 @@
 import express from 'express'
 import bundle from '@cyberspace/webpack-config/bundle'
+import portfinder from 'portfinder'
 import router from '@cyberspace/router'
 import { renderToString } from 'react-dom/server'
 import { renderStylesToString } from 'emotion-server'
@@ -7,8 +8,6 @@ import routes from './routes'
 import favicon from './assets/favicon.png'
 
 const app = express()
-
-const port = 3001
 
 app.use('/static', bundle)
 
@@ -43,6 +42,15 @@ app.use(async (req, res) => {
   }
 })
 
-app.listen(port, () => {
-  console.log('Server listening at port', port)
+portfinder.getPort({
+  port: 3000,
+  stopPort: 3333
+}, (error, port) => {
+  if (error) {
+    throw error
+  }
+
+  app.listen(port, () => {
+    console.log('Server listening at port', port)
+  })
 })
