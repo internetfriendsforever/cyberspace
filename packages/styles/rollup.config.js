@@ -5,15 +5,15 @@ export default [{
   input: 'index.js',
   output: [
     {
-      file: 'dist/cjs.js',
+      file: 'index.cjs.js',
       format: 'cjs'
     },
     {
-      file: 'dist/esm.js',
+      file: 'index.esm.js',
       format: 'esm'
     },
     {
-      file: 'dist/iife.js',
+      file: 'index.iife.js',
       format: 'iife',
       name: 'cyberspace.css'
     }

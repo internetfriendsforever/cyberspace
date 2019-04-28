@@ -8,8 +8,8 @@
   "repository": "https://github.com/internetfriendsforever/cyberspace/packages/css",
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
   "license": "MIT",
-  "main": "dist/cjs.js",
-  "module": "dist/esm.js",
+  "main": "index.cjs.js",
+  "module": "index.esm.js",
   "files": [
     "dist/iife.js"
   ],
