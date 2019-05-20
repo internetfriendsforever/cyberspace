@@ -7,7 +7,7 @@
   "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
   "license": "MIT",
   "scripts": {
-    "deploy": "now --regions bru --env NODE_ENV=\"production\"",
+    "deploy": "npm run clean && now --regions bru --env NODE_ENV=\"production\"",
     "build": "webpack --config node_modules/@cyberspace/webpack-config --mode=production",
     "start": "node build/server.js",
     "dev": "webpack-development --config node_modules/@cyberspace/webpack-config --exec 'node -r dotenv/config build/server'",
