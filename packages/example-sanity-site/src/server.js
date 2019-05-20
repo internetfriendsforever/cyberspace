@@ -1,7 +1,7 @@
 import express from 'express'
 import bundle from '@cyberspace/webpack-config/bundle'
 import router from '@cyberspace/router'
-import createApiClient from '@cyberspace/api-client'
+import createApiClientCache from '@cyberspace/api-client'
 import { renderToString } from 'react-dom/server'
 import { renderStylesToString } from 'emotion-server'
 import apiMiddleware from './api'
@@ -14,23 +14,29 @@ const port = 3001
 const url = process.env.NOW_URL || `http://localhost:${port}`
 const apiPath = '/api'
 const apiUrl = `${url}${apiPath}`
-const apiClient = createApiClient(apiUrl)()
+const createApiClient = createApiClientCache(apiUrl)
+
+app.use((req, res, next) => {
+  res.locals.api = createApiClient()
+  next()
+})
 
 app.use('/static', bundle)
 
 app.use(apiPath, apiMiddleware)
 
 app.use('/invalidate', (req, res) => {
-  apiClient.flush()
+  res.locals.api.flush()
   res.status(200).end()
 })
 
 app.use(async (req, res) => {
   try {
+    const { api } = res.locals
     const { path, query } = req
     const { key, params } = router.resolve(routes, path)
     const navigate = path => res.redirect(path)
-    const route = await routes[key || '404']({ path, params, query, navigate, api: apiClient })
+    const route = await routes[key || '404']({ path, params, query, navigate, api })
 
     if (!res.headersSent) {
       res.status(route.statusCode || 200).send(`
@@ -46,7 +52,7 @@ app.use(async (req, res) => {
           </head>
           <body>
             <div id='root'>${renderStylesToString(renderToString(route.component))}</div>
-            <script>window.dehydrated = ${apiClient.dehydrate()};</script>
+            <script>window.dehydrated = ${api.dehydrate()};</script>
             <script src='/static/client.js'></script>
           </body>
         </html>
