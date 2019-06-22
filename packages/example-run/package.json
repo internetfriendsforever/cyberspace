@@ -1,0 +1,19 @@
+{
+  "name": "@cyberspace/example-run",
+  "version": "0.3.28",
+  "private": true,
+  "scripts": {
+    "start": "run start",
+    "deploy": "run deploy example.cyberspace.run",
+    "test": "standard"
+  },
+  "dependencies": {
+    "@cyberspace/run": "^0.3.27",
+    "@cyberspace/run-file": "^0.3.27",
+    "@cyberspace/run-router": "^0.3.27",
+    "the-answer": "^1.0.0"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@cyberspace/run-router",
+  "version": "0.3.28",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "dependencies": {
+    "@cyberspace/router": "^0.3.27",
+    "query-string": "^6.8.1"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}

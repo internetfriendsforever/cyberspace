@@ -1,0 +1,312 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Parameters": {
+    "Domain": {
+      "Type": "String"
+    },
+
+    "BuildFunctionName": {
+      "Type": "String"
+    },
+
+    "BuildFunctionCode": {
+      "Type": "String"
+    },
+
+    "MainFunctionName": {
+      "Type": "String"
+    },
+
+    "MainFunctionCode": {
+      "Type": "String"
+    },
+
+    "StageName": {
+      "Type": "String"
+    },
+
+    "CertificateArn": {
+      "Type": "String"
+    }
+  },
+
+  "Resources": {
+    "Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": { "Ref": "Domain" }
+      }
+    },
+
+    "BuildRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["lambda.amazonaws.com"]
+              },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        },
+
+        "Policies": [{
+          "PolicyName": "S3Policy",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [{
+              "Effect": "Allow",
+              "Action": "s3:*",
+              "Resource": { "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref": "Bucket" }, "/*" ] ] }
+            }]
+          }
+        }]
+      }
+    },
+
+    "BuildFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": { "Ref": "BuildFunctionName" },
+        "Handler": "index.handler",
+        "Runtime": "nodejs8.10",
+        "Role": { "Fn::GetAtt": ["BuildRole", "Arn"] },
+        "Timeout": 300,
+        "MemorySize": 1024,
+        "Code": {
+          "ZipFile": { "Ref": "BuildFunctionCode" }
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": { "Ref": "Domain" },
+            "REGION": { "Ref": "AWS::Region" }
+          }
+        }
+      }
+    },
+
+    "MainFunctionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["lambda.amazonaws.com"]
+              },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        }
+      }
+    },
+
+    "ApiRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["apigateway.amazonaws.com"]
+              },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        },
+
+        "Policies": [{
+          "PolicyName": "lambda",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": ["execute-api:*", "lambda:*"],
+                "Resource": "*"
+              }
+            ]
+          }
+        }, {
+          "PolicyName": "cloudfront",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "AllowCloudFrontUpdateDistribution",
+                "Effect": "Allow",
+                "Action": ["cloudfront:updateDistribution"],
+                "Resource": "*"
+              }
+            ]
+          }
+        }]
+      }
+    },
+
+    "MainFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "FunctionName": { "Ref": "MainFunctionName" },
+        "Handler": "index.handler",
+        "Runtime": "nodejs8.10",
+        "Role": { "Fn::GetAtt": ["MainFunctionRole", "Arn"] },
+        "Code": {
+          "ZipFile": { "Ref": "MainFunctionCode" }
+        }
+      }
+    },
+
+    "Api": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": { "Ref": "Domain" },
+        "EndpointConfiguration": {
+          "Types": ["REGIONAL"]
+        }
+      }
+    },
+
+    "ApiResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "RestApiId": { "Ref": "Api" },
+        "ParentId": { "Fn::GetAtt": ["Api", "RootResourceId"] },
+        "PathPart": "{proxy+}"
+      }
+    },
+
+    "ApiMethodRoot": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "ResourceId": { "Fn::GetAtt": ["Api", "RootResourceId"] },
+        "RestApiId": { "Ref": "Api" },
+        "HttpMethod": "ANY",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Credentials": { "Fn::GetAtt": ["ApiRole", "Arn"] },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "CacheNamespace": "ekaufo",
+          "Uri": { "Fn::Join": ["", [
+            "arn:aws:apigateway:",
+            { "Ref": "AWS::Region" },
+            ":lambda:path/2015-03-31/functions/",
+            { "Fn::GetAtt": ["MainFunction", "Arn"] },
+            "/invocations"
+          ]] }
+        }
+      }
+    },
+
+    "ApiMethodProxy": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "ResourceId": { "Ref": "ApiResource" },
+        "RestApiId": { "Ref": "Api" },
+        "HttpMethod": "ANY",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS_PROXY",
+          "IntegrationHttpMethod": "POST",
+          "Credentials": { "Fn::GetAtt": ["ApiRole", "Arn"] },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "CacheNamespace": "ekaufo",
+          "Uri": { "Fn::Join": ["", [
+            "arn:aws:apigateway:",
+            { "Ref": "AWS::Region" },
+            ":lambda:path/2015-03-31/functions/",
+            { "Fn::GetAtt": ["MainFunction", "Arn"] },
+            "/invocations"
+          ]] }
+        }
+      }
+    },
+
+    "ApiDeployment": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "DependsOn": ["ApiMethodRoot", "ApiMethodProxy"],
+      "Properties": {
+        "RestApiId": { "Ref": "Api" },
+        "StageName": { "Ref": "StageName" }
+      }
+    },
+
+    "Distribution": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Enabled": true,
+          "IPV6Enabled": true,
+          "HttpVersion": "http2",
+          "Origins": [
+            {
+              "Id": "ApiGateway",
+              "DomainName": { "Fn::Join": ["", [
+                { "Ref": "Api" },
+                ".execute-api.",
+                { "Ref": "AWS::Region" },
+                ".amazonaws.com"
+              ]] },
+              "OriginPath": { "Fn::Join": ["", [
+                "/",
+                { "Ref": "StageName" }
+              ]] },
+              "CustomOriginConfig": {
+                "HTTPSPort": 443,
+                "OriginProtocolPolicy": "https-only"
+              }
+            }
+          ],
+          "DefaultCacheBehavior": {
+            "AllowedMethods": ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"],
+            "CachedMethods": ["GET", "HEAD", "OPTIONS"],
+            "ForwardedValues": {
+              "Headers": [
+                "Access-Control-Request-Headers",
+                "Access-Control-Request-Method",
+                "Origin",
+                "Authorization"
+              ],
+              "QueryString": true
+            },
+            "TargetOriginId": "ApiGateway",
+            "ViewerProtocolPolicy": "redirect-to-https",
+            "Compress": true,
+            "DefaultTTL": 300
+          },
+          "CustomErrorResponses": [
+            {
+              "ErrorCachingMinTTL": 0,
+              "ErrorCode": 400
+            },
+            {
+              "ErrorCachingMinTTL": 1,
+              "ErrorCode": 403
+            },
+            {
+              "ErrorCachingMinTTL": 5,
+              "ErrorCode": 500
+            }
+          ]
+        }
+      }
+    }
+  },
+
+  "Outputs": {
+    "DomainName": {
+      "Value": { "Fn::GetAtt": [ "Distribution", "DomainName" ] }
+    }
+  }
+}
