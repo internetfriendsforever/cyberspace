@@ -1,6 +1,9 @@
 {
   "name": "@cyberspace/run-file",
   "version": "0.3.29",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "index.js",
   "scripts": {
     "test": "standard"
