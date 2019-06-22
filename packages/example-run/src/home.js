@@ -1,7 +1,7 @@
 const answer = require('the-answer')
-const html = require('./html')
+const page = require('./page')
 
-module.exports = () => html({
+module.exports = () => page({
   title: 'Hello',
   body: `The answer to the ultimate question of life, the universe, and everything is ${answer}`
 })

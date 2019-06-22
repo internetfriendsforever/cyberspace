@@ -9,6 +9,7 @@ exports.handler = router({
   GET: {
     '/': require('./src/home.js'),
     '/about': require('./src/about.js'),
-    '/static/(.*)': staticHandler
+    '/static/(.*)': staticHandler,
+    '/(.*)': require('./src/404.js')
   }
 })

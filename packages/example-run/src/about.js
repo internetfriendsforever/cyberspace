@@ -1,6 +1,6 @@
-const html = require('./html')
+const page = require('./page')
 
-module.exports = () => html({
+module.exports = () => page({
   title: 'About',
   body: 'Wild cats and dark horses in the crimson moon'
 })
