@@ -30,7 +30,22 @@ module.exports = ({ projectPath }) => {
       }
     }
 
-    handler(params, context, callback)
+    handler(params, context, (error, payload) => {
+      if (error) {
+        callback(error)
+      } else {
+        let body = payload.body
+
+        if (payload.isBase64Encoded) {
+          body = Buffer.from(payload.body, 'base64')
+        }
+
+        callback(null, {
+          ...payload,
+          body
+        })
+      }
+    })
   })
 
   server.listen(port, (error) => {
