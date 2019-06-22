@@ -172,7 +172,10 @@
         "Name": { "Ref": "Domain" },
         "EndpointConfiguration": {
           "Types": ["REGIONAL"]
-        }
+        },
+        "BinaryMediaTypes": [
+          "*/*"
+        ]
       }
     },
 
@@ -196,8 +199,6 @@
           "Type": "AWS_PROXY",
           "IntegrationHttpMethod": "POST",
           "Credentials": { "Fn::GetAtt": ["ApiRole", "Arn"] },
-          "ContentHandling": "CONVERT_TO_TEXT",
-          "CacheNamespace": "ekaufo",
           "Uri": { "Fn::Join": ["", [
             "arn:aws:apigateway:",
             { "Ref": "AWS::Region" },
@@ -220,8 +221,6 @@
           "Type": "AWS_PROXY",
           "IntegrationHttpMethod": "POST",
           "Credentials": { "Fn::GetAtt": ["ApiRole", "Arn"] },
-          "ContentHandling": "CONVERT_TO_TEXT",
-          "CacheNamespace": "ekaufo",
           "Uri": { "Fn::Join": ["", [
             "arn:aws:apigateway:",
             { "Ref": "AWS::Region" },
