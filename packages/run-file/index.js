@@ -9,7 +9,8 @@ module.exports = file => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': mime.getType(filepath) },
-      body: fs.readFileSync(filepath)
+      body: fs.readFileSync(filepath).toString('base64'),
+      isBase64Encoded: true
     }
   }
 

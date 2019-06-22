@@ -1,11 +1,15 @@
+const path = require('path')
 const router = require('@cyberspace/run-router')
 const file = require('@cyberspace/run-file')
+
+const staticPath = path.resolve(__dirname, `src/static/`)
+const staticHandler = ({ params }) => file(path.join(staticPath, params[0]))
 
 exports.handler = router({
   GET: {
     '/': require('./src/home.js'),
     '/about': require('./src/about.js'),
-    '/static/(.*)': ({ params }) => file(`src/static/${params[0]}`),
+    '/static/(.*)': staticHandler,
     '(.*)': require('./src/404.js')
   }
 })

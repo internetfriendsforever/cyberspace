@@ -15,8 +15,8 @@ exports.handler = async () => {
 
   console.log('Installing unzip...')
 
-  await shell('npm', ['install', 'unzip@0.1.11', '--prefix', root, '--cache', root], { cwd: root })
-  const unzip = require(`${root}/node_modules/unzip`)
+  await shell('npm', ['install', 'unzip-stream@0.3.0', '--prefix', root, '--cache', root], { cwd: root })
+  const unzip = require(`${root}/node_modules/unzip-stream`)
 
   await new Promise((resolve, reject) => {
     console.log(`Downloading source...`)

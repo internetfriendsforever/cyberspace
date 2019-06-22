@@ -27,7 +27,9 @@ module.exports = async ({
     head: ['Type', 'Name', 'Value']
   })
 
-  const acm = new ACM({ region })
+  const acm = new ACM({
+    region: 'us-east-1'
+  })
 
   let certificateArn = null
 
@@ -156,6 +158,10 @@ module.exports = async ({
   const buildResult = await lambda.invoke({
     FunctionName: buildFunctionName
   }).promise()
+
+  if (buildResult.FunctionError) {
+    throw new Error(`Error while installing dependencies (${buildResult.FunctionError})`)
+  }
 
   if (buildResult.StatusCode !== 200) {
     throw new Error(`Build result statusCode ${buildResult.statusCode}. Expected 200`)
