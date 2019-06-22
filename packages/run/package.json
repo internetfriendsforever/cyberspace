@@ -1,6 +1,9 @@
 {
   "name": "@cyberspace/run",
   "version": "0.3.29",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "run": "./src/index.js"
   },
