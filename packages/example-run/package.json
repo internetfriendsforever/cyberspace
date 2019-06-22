@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/example-run",
-  "version": "0.3.28",
+  "version": "0.3.29",
   "private": true,
   "scripts": {
     "start": "run start",
@@ -8,9 +8,9 @@
     "test": "standard"
   },
   "dependencies": {
-    "@cyberspace/run": "^0.3.27",
-    "@cyberspace/run-file": "^0.3.27",
-    "@cyberspace/run-router": "^0.3.27",
+    "@cyberspace/run": "^0.3.29",
+    "@cyberspace/run-file": "^0.3.29",
+    "@cyberspace/run-router": "^0.3.29",
     "the-answer": "^1.0.0"
   },
   "devDependencies": {

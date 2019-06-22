@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/run",
-  "version": "0.3.28",
+  "version": "0.3.29",
   "bin": {
     "run": "./src/index.js"
   },

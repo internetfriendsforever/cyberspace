@@ -1,6 +1,6 @@
 {
   "name": "@cyberspace/run-router",
-  "version": "0.3.28",
+  "version": "0.3.29",
   "main": "index.js",
   "scripts": {
     "test": "standard"
