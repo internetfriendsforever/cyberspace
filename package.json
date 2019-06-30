@@ -1,6 +1,6 @@
 {
   "name": "root",
   "devDependencies": {
-    "lerna": "^3.3.0"
+    "lerna": "^3.15.0"
   }
 }
