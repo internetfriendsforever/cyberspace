@@ -58,7 +58,7 @@ app.use(async (req, res) => {
           </head>
           <body>
             <div id='root'>${renderToString(route.component)}</div>
-            <script>window.dehydrated = ${apiClient.dehydrate()};</script>
+            <script>window.dehydrated = ${api.dehydrate()};</script>
             <script src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
             <script src='/static/client.js'></script>
           </body>
