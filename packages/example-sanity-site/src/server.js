@@ -1,9 +1,9 @@
 import express from 'express'
 import bundle from '@cyberspace/webpack-config/bundle'
 import router from '@cyberspace/router'
+import styles from '@cyberspace/styles'
 import createApiClientCache from '@cyberspace/api-client'
 import { renderToString } from 'react-dom/server'
-import { renderStylesToString } from 'emotion-server'
 import apiMiddleware from './api'
 import routes from './routes'
 import favicon from './assets/favicon.png'
@@ -48,11 +48,18 @@ app.use(async (req, res) => {
             <meta name='viewport' content='width=device-width, initial-scale=1' />
             <meta name='theme-color' content='#000' />
             <link rel='icon' type='image/png' href='${favicon}'>
-            <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+            <style>
+              body {
+                background: lightyellow;
+              }
+
+              ${styles.toString()}
+            </style>
           </head>
           <body>
-            <div id='root'>${renderStylesToString(renderToString(route.component))}</div>
+            <div id='root'>${renderToString(route.component)}</div>
             <script>window.dehydrated = ${api.dehydrate()};</script>
+            <script src="https://cdn.polyfill.io/v3/polyfill.min.js"></script>
             <script src='/static/client.js'></script>
           </body>
         </html>
