@@ -1,4 +1,4 @@
-const styles = require('./dist/cjs')
+const styles = require('./index.cjs.js')
 
 const header = styles.add(`
   font-size: 2em;
