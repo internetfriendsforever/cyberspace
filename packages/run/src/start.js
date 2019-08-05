@@ -1,15 +1,18 @@
+const os = require('os')
 const path = require('path')
 const http = require('http')
+const colors = require('ansi-colors')
+const portfinder = require('portfinder')
 
-module.exports = ({ projectPath }) => {
-  const port = 3000
+portfinder.basePort = 3000
 
+module.exports = async ({ projectPath }) => {
   const server = http.createServer(async (request, response) => {
     Object.keys(require.cache).forEach(key => {
       delete require.cache[key]
     })
 
-    const { handler } = require(path.join(projectPath, 'index.js'))
+    const context = {}
 
     const params = {
       path: request.url,
@@ -17,42 +20,89 @@ module.exports = ({ projectPath }) => {
       headers: request.headers
     }
 
-    const context = {}
-
-    const callback = (error, result) => {
+    const callback = (error, result = {}) => {
       if (error) {
         response.writeHead(500, { 'Content-Type': 'text/plain' })
         response.end('Internal server error')
-        console.error(error)
+        console.log(error)
       } else {
         response.writeHead(result.statusCode || 404, result.headers || {})
         response.end(result.body || 'Not found')
       }
+
+      const status = response.statusCode
+
+      let color = colors.gray
+
+      if (status >= 200) {
+        color = colors.green
+      }
+
+      if (status >= 300) {
+        color = colors.blue
+      }
+
+      if (status >= 400) {
+        color = colors.yellow
+      }
+
+      if (status >= 500) {
+        color = colors.red
+      }
+
+      console.log(color(status), request.method, request.url)
     }
 
-    handler(params, context, (error, payload) => {
-      if (error) {
-        callback(error)
-      } else {
-        let body = payload.body
+    try {
+      const { handler } = require(path.join(projectPath, 'index.js'))
 
-        if (payload.isBase64Encoded) {
-          body = Buffer.from(payload.body, 'base64')
+      const result = handler(params, context, (error, payload) => {
+        if (error) {
+          callback(error)
+        } else {
+          let body = payload.body
+
+          if (payload.isBase64Encoded) {
+            body = Buffer.from(payload.body, 'base64')
+          }
+
+          callback(null, { ...payload, body })
         }
+      })
 
-        callback(null, {
-          ...payload,
-          body
-        })
+      if (result) {
+        Promise.resolve(result).then(payload => callback(null, payload))
       }
-    })
+    } catch (error) {
+      callback(error)
+    }
   })
 
-  server.listen(port, (error) => {
+  const port = await portfinder.getPortPromise()
+
+  server.listen(port, async error => {
     if (error) {
       throw error
     }
 
-    console.log(`Server is listening on ${port}`)
+    const addresses = []
+    const interfaces = os.networkInterfaces()
+
+    Object.keys(interfaces).forEach(key => {
+      interfaces[key].forEach(({ internal, family, address }) => {
+        if (family === 'IPv4') {
+          addresses.push(address)
+        }
+      })
+    })
+
+    const urls = addresses
+      .map(address => `http://${address}:${port}/`)
+      .map(url => colors.underline(colors.green(url)))
+
+    console.log(`Server listening at port ${port}`)
+    console.log('')
+    console.log(urls.join('\n'))
+    console.log('')
   })
 }

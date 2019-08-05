@@ -11,11 +11,14 @@
     "test": "standard"
   },
   "dependencies": {
+    "ansi-colors": "^4.1.1",
     "archiver": "^3.0.0",
     "aws-sdk": "^2.472.0",
     "cli-table": "^0.3.1",
+    "default-gateway": "^5.0.2",
     "glob": "^7.1.4",
     "ignore": "^5.1.2",
+    "portfinder": "^1.0.21",
     "psl": "^1.1.33"
   },
   "devDependencies": {
