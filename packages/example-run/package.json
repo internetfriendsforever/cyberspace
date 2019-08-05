@@ -11,6 +11,8 @@
     "@cyberspace/run": "^0.3.32",
     "@cyberspace/run-file": "^0.3.30",
     "@cyberspace/run-router": "^0.3.30",
+    "@cyberspace/styles": "^0.3.18",
+    "pretty": "^2.0.0",
     "the-answer": "^1.0.0"
   },
   "devDependencies": {

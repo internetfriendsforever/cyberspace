@@ -15,7 +15,7 @@ export default [{
     {
       file: 'index.iife.js',
       format: 'iife',
-      name: 'cyberspace.css'
+      name: 'cyberspace.styles'
     }
   ],
 

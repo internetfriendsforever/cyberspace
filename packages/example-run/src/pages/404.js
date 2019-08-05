@@ -1,6 +1,6 @@
-const page = require('./page')
+const html = require('../html')
 
-module.exports = () => page({
+module.exports = () => html({
   statusCode: 404,
   title: 'Not found',
   body: 'Page not found'
