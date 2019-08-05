@@ -1,5 +1,5 @@
 this.cyberspace = this.cyberspace || {};
-this.cyberspace.css = (function () {
+this.cyberspace.styles = (function () {
 	'use strict';
 
 	function createCommonjsModule(fn, module) {
@@ -1690,23 +1690,6 @@ this.cyberspace.css = (function () {
 
 	Style.prototype.toString = function () {
 	  return this.name
-	};
-
-	Style.prototype.hash = function () {
-	  if (this.input.length === 0) {
-	    return 0
-	  }
-
-	  let hash;
-	  let chr;
-
-	  for (let i = 0; i < this.input.length; i++) {
-	    chr = this.input.charCodeAt(i);
-	    hash = ((hash << 5) - hash) + chr;
-	    hash |= 0;
-	  }
-
-	  return hash
 	};
 
 	function hash (string) {
