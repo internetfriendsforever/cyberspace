@@ -18,7 +18,7 @@ module.exports = ({ statusCode = 200, title, body }) => ({
       <head>
         <title>${title}</title>
         <meta charset="utf-8" />
-        <link rel="shortcut icon" href="/static/favicon.png" />
+        <link rel="shortcut icon" href="/assets/favicon.png" />
         <link rel="stylesheet" href="/styles.css" />
       </head>
       <body class="${css.body}">
