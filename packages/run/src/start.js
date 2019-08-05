@@ -20,14 +20,20 @@ module.exports = async ({ projectPath }) => {
       headers: request.headers
     }
 
-    const callback = (error, result = {}) => {
+    const callback = (error, payload = {}) => {
       if (error) {
         response.writeHead(500, { 'Content-Type': 'text/plain' })
         response.end('Internal server error')
         console.log(error)
       } else {
-        response.writeHead(result.statusCode || 404, result.headers || {})
-        response.end(result.body || 'Not found')
+        let body = payload.body
+
+        if (payload.isBase64Encoded) {
+          body = Buffer.from(payload.body, 'base64')
+        }
+
+        response.writeHead(payload.statusCode || 404, payload.headers || {})
+        response.end(body || 'Not found')
       }
 
       const status = response.statusCode
@@ -60,13 +66,7 @@ module.exports = async ({ projectPath }) => {
         if (error) {
           callback(error)
         } else {
-          let body = payload.body
-
-          if (payload.isBase64Encoded) {
-            body = Buffer.from(payload.body, 'base64')
-          }
-
-          callback(null, { ...payload, body })
+          callback(null, payload)
         }
       })
 
