@@ -16,7 +16,7 @@
   "dependencies": {
     "@cyberspace/api-client": "^0.3.27",
     "@cyberspace/router": "^0.3.27",
-    "@cyberspace/styles": "^0.3.18",
+    "@cyberspace/styles": "^0.3.20",
     "@cyberspace/webpack-config": "^0.3.28",
     "@cyberspace/webpack-development": "^0.3.24",
     "express": "^4.16.3",
