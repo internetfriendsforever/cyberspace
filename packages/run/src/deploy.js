@@ -211,6 +211,10 @@ async function createOrUpdateStack ({ region, name, template, parameters }) {
 
   console.log(`${exists ? 'Updating' : 'Creating'} stack...`)
 
+  if (!exists) {
+    console.log('Note: Setting up the initial Cloudfront Distribution takes a long time. It happens only once per hostname, so your next deployment will be a lot faster!')
+  }
+
   try {
     await cloudformation[`${exists ? 'update' : 'create'}Stack`]({
       StackName: name,

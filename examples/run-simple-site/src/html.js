@@ -4,30 +4,37 @@ const styles = require('@cyberspace/styles')
 const css = {
   body: styles.add(`
     background: lightyellow;
+  `),
+
+  nav: styles.add(`
+    margin-bottom: 1em;
   `)
 }
 
-module.exports = ({ statusCode = 200, title, body }) => ({
+module.exports = ({
+  path,
+  statusCode = 200,
+  title,
+  content
+}) => ({
   statusCode,
-  headers: {
-    'Content-Type': 'text/html'
-  },
+  headers: { 'Content-Type': 'text/html' },
   body: pretty(`
     <!doctype html>
     <html>
       <head>
-        <title>${title}</title>
+        <title>${title} – @cyberspace/run simple site example</title>
         <meta charset="utf-8" />
         <link rel="shortcut icon" href="/assets/favicon.png" />
         <link rel="stylesheet" href="/styles.css" />
       </head>
       <body class="${css.body}">
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/about">About</a></li>
-        </ul>
+        <nav class="${css.nav}">
+          <a href="/">Home</a>
+          <a href="/about">About</a>
+        </nav>
 
-        ${body}
+        ${content}
       </body>
     </html>
   `, {
