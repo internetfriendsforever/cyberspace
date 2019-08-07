@@ -8,9 +8,9 @@
     "test": "standard"
   },
   "dependencies": {
-    "@cyberspace/run": "^0.3.34",
+    "@cyberspace/run": "^0.3.35",
     "@cyberspace/run-file": "^0.3.30",
-    "@cyberspace/run-router": "^0.3.31",
+    "@cyberspace/run-router": "^0.3.32",
     "@cyberspace/styles": "^0.3.20",
     "pretty": "^2.0.0",
     "the-answer": "^1.0.0"

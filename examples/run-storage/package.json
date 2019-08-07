@@ -8,8 +8,8 @@
     "test": "standard"
   },
   "dependencies": {
-    "@cyberspace/run": "^0.3.34",
-    "@cyberspace/run-router": "^0.3.31",
+    "@cyberspace/run": "^0.3.35",
+    "@cyberspace/run-router": "^0.3.32",
     "@cyberspace/run-storage": "^0.3.0"
   },
   "devDependencies": {
