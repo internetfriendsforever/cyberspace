@@ -100,9 +100,6 @@ module.exports = async ({
       ParameterKey: 'MainFunctionName',
       ParameterValue: mainFunctionName
     }, {
-      ParameterKey: 'MainFunctionCode',
-      ParameterValue: 'exports.handler = () => {}'
-    }, {
       ParameterKey: 'BuildFunctionName',
       ParameterValue: buildFunctionName
     }, {
@@ -225,6 +222,8 @@ async function createOrUpdateStack ({ region, name, template, parameters }) {
   } catch (error) {
     if (error.code !== 'ValidationError') {
       throw error
+    } else {
+      console.warn(error.code, error.message)
     }
   }
 

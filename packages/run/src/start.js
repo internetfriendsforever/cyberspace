@@ -7,6 +7,8 @@ const portfinder = require('portfinder')
 portfinder.basePort = 3000
 
 module.exports = async ({ projectPath }) => {
+  process.env.LOCAL_ROOT = projectPath
+
   const server = http.createServer(async (request, response) => {
     Object.keys(require.cache).forEach(key => {
       delete require.cache[key]
@@ -14,26 +16,30 @@ module.exports = async ({ projectPath }) => {
 
     const context = {}
 
-    const params = {
+    const event = {
       path: request.url,
       httpMethod: request.method,
       headers: request.headers
     }
 
-    const callback = (error, payload = {}) => {
+    const callback = (error, {
+      statusCode = 200,
+      headers = {},
+      body = '',
+      isBase64Encoded = false
+    } = {}) => {
       if (error) {
+        console.log(error)
         response.writeHead(500, { 'Content-Type': 'text/plain' })
         response.end('Internal server error')
-        console.log(error)
       } else {
-        let body = payload.body
+        response.writeHead(statusCode, headers)
 
-        if (payload.isBase64Encoded) {
-          body = Buffer.from(payload.body, 'base64')
+        if (isBase64Encoded) {
+          response.end(Buffer.from(body, 'base64'))
+        } else {
+          response.end(body)
         }
-
-        response.writeHead(payload.statusCode || 404, payload.headers || {})
-        response.end(body || 'Not found')
       }
 
       const status = response.statusCode
@@ -62,7 +68,7 @@ module.exports = async ({ projectPath }) => {
     try {
       const { handler } = require(path.join(projectPath, 'index.js'))
 
-      const result = handler(params, context, (error, payload) => {
+      const result = handler(event, context, (error, payload) => {
         if (error) {
           callback(error)
         } else {
