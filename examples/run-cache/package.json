@@ -1,0 +1,19 @@
+{
+  "name": "@cyberspace/example-run-cache",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "start": "run start",
+    "deploy": "run deploy example-cache.cyberspace.run && npm run invalidate",
+    "invalidate": "curl --data \"\" https://example-cache.cyberspace.run/invalidate",
+    "test": "standard"
+  },
+  "dependencies": {
+    "@cyberspace/run": "^0.3.35",
+    "@cyberspace/run-router": "^0.3.32",
+    "@cyberspace/run-cache": "^0.3.1"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}

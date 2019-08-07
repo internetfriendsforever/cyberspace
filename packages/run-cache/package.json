@@ -1,0 +1,14 @@
+{
+  "name": "@cyberspace/run-cache",
+  "version": "0.3.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
