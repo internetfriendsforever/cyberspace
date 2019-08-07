@@ -2,13 +2,13 @@ const fs = require('fs')
 const path = require('path')
 const mime = require('mime')
 
-module.exports = file => {
+module.exports = (file, { headers = {} } = {}) => {
   const filepath = path.resolve(process.cwd(), file)
 
   if (fs.existsSync(filepath)) {
     return {
       statusCode: 200,
-      headers: { 'Content-Type': mime.getType(filepath) },
+      headers: { 'Content-Type': mime.getType(filepath), ...headers },
       body: fs.readFileSync(filepath).toString('base64'),
       isBase64Encoded: true
     }

@@ -61,6 +61,16 @@
               "Resource": { "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref": "Bucket" }, "/*" ] ] }
             }]
           }
+        }, {
+          "PolicyName": "CloudFrontPolicy",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [{
+              "Effect": "Allow",
+              "Action": "cloudfront:CreateInvalidation",
+              "Resource": "*"
+            }]
+          }
         }]
       }
     },
@@ -80,7 +90,8 @@
         "Environment": {
           "Variables": {
             "BUCKET": { "Ref": "Domain" },
-            "REGION": { "Ref": "AWS::Region" }
+            "REGION": { "Ref": "AWS::Region" },
+            "DISTRIBUTION": { "Ref": "Distribution" }
           }
         }
       }
@@ -99,7 +110,8 @@
         "Environment": {
           "Variables": {
             "BUCKET": { "Ref": "Domain" },
-            "REGION": { "Ref": "AWS::Region" }
+            "REGION": { "Ref": "AWS::Region" },
+            "DISTRIBUTION": { "Ref": "Distribution" }
           }
         }
       }
