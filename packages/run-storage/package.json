@@ -1,0 +1,17 @@
+{
+  "name": "@cyberspace/run-storage",
+  "version": "0.3.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  },
+  "dependencies": {
+    "mkdirp": "^0.5.1"
+  }
+}

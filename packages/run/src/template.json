@@ -18,10 +18,6 @@
       "Type": "String"
     },
 
-    "MainFunctionCode": {
-      "Type": "String"
-    },
-
     "StageName": {
       "Type": "String"
     },
@@ -39,7 +35,7 @@
       }
     },
 
-    "BuildRole": {
+    "FunctionRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "AssumeRolePolicyDocument": {
@@ -75,7 +71,7 @@
         "FunctionName": { "Ref": "BuildFunctionName" },
         "Handler": "index.handler",
         "Runtime": "nodejs8.10",
-        "Role": { "Fn::GetAtt": ["BuildRole", "Arn"] },
+        "Role": { "Fn::GetAtt": ["FunctionRole", "Arn"] },
         "Timeout": 300,
         "MemorySize": 1024,
         "Code": {
@@ -90,20 +86,21 @@
       }
     },
 
-    "MainFunctionRole": {
-      "Type": "AWS::IAM::Role",
+    "MainFunction": {
+      "Type": "AWS::Lambda::Function",
       "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": ["lambda.amazonaws.com"]
-              },
-              "Action": ["sts:AssumeRole"]
-            }
-          ]
+        "FunctionName": { "Ref": "MainFunctionName" },
+        "Handler": "index.handler",
+        "Runtime": "nodejs8.10",
+        "Role": { "Fn::GetAtt": ["FunctionRole", "Arn"] },
+        "Code": {
+          "ZipFile": "exports.handler = () => {}"
+        },
+        "Environment": {
+          "Variables": {
+            "BUCKET": { "Ref": "Domain" },
+            "REGION": { "Ref": "AWS::Region" }
+          }
         }
       }
     },
@@ -150,19 +147,6 @@
             ]
           }
         }]
-      }
-    },
-
-    "MainFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "FunctionName": { "Ref": "MainFunctionName" },
-        "Handler": "index.handler",
-        "Runtime": "nodejs8.10",
-        "Role": { "Fn::GetAtt": ["MainFunctionRole", "Arn"] },
-        "Code": {
-          "ZipFile": { "Ref": "MainFunctionCode" }
-        }
       }
     },
 
@@ -286,8 +270,7 @@
             },
             "TargetOriginId": "ApiGateway",
             "ViewerProtocolPolicy": "redirect-to-https",
-            "Compress": true,
-            "DefaultTTL": 300
+            "Compress": true
           },
           "CustomErrorResponses": [
             {

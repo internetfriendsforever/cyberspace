@@ -1,0 +1,18 @@
+{
+  "name": "@cyberspace/example-run-storage",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "start": "run start",
+    "deploy": "run deploy example-storage.cyberspace.run",
+    "test": "standard"
+  },
+  "dependencies": {
+    "@cyberspace/run": "^0.3.34",
+    "@cyberspace/run-router": "^0.3.31",
+    "@cyberspace/run-storage": "^0.3.0"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
