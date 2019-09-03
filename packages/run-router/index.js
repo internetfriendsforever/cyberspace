@@ -9,6 +9,7 @@ module.exports = routes => async (event, context, callback) => {
     return route({
       path: event.path,
       params: match.params,
+      headers: event.headers,
       query: event.queryStringParameters,
       queryMultiValue: event.multiValueQueryStringParameters
     })
