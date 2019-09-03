@@ -1,7 +1,9 @@
 const { default: PQueue } = require('p-queue')
 const os = require('os')
+const url = require('url')
 const path = require('path')
 const http = require('http')
+const querystring = require('querystring')
 const colors = require('ansi-colors')
 const portfinder = require('portfinder')
 
@@ -27,11 +29,7 @@ module.exports = async ({ projectPath }) => {
 
       const context = {}
 
-      const event = {
-        path: request.url,
-        httpMethod: request.method,
-        headers: request.headers
-      }
+      const event = formatEvent(request)
 
       const callback = (error, {
         statusCode = 200,
@@ -123,4 +121,34 @@ module.exports = async ({ projectPath }) => {
     console.log(urls.join('\n'))
     console.log('')
   })
+}
+
+function formatEvent (request) {
+  const urlParts = url.parse(request.url)
+  const query = querystring.parse(urlParts.query)
+
+  const queryStringParameters = {}
+  const multiValueQueryStringParameters = {}
+
+  for (let key in query) {
+    const value = query[key]
+
+    if (Array.isArray(value)) {
+      queryStringParameters[key] = value[value.length - 1]
+      multiValueQueryStringParameters[key] = value
+    } else {
+      queryStringParameters[key] = value
+      multiValueQueryStringParameters[key] = [value]
+    }
+  }
+
+  const event = {
+    path: urlParts.pathname,
+    httpMethod: request.method,
+    headers: request.headers,
+    queryStringParameters,
+    multiValueQueryStringParameters
+  }
+
+  return event
 }
