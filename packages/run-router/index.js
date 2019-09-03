@@ -1,5 +1,3 @@
-const URL = require('url')
-const queryString = require('query-string')
 const router = require('@cyberspace/router')
 
 module.exports = routes => async (event, context, callback) => {
@@ -11,7 +9,8 @@ module.exports = routes => async (event, context, callback) => {
     return route({
       path: event.path,
       params: match.params,
-      query: queryString.parse(URL.parse(event.path).search)
+      query: event.queryStringParameters,
+      queryMultiValue: event.multiValueQueryStringParameters
     })
   } else {
     return {
