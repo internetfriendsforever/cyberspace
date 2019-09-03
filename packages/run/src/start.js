@@ -1,3 +1,4 @@
+const { default: PQueue } = require('p-queue')
 const os = require('os')
 const path = require('path')
 const http = require('http')
@@ -9,79 +10,90 @@ portfinder.basePort = 3000
 module.exports = async ({ projectPath }) => {
   process.env.LOCAL_ROOT = projectPath
 
+  const queue = new PQueue({
+    concurrency: 1
+  })
+
   const server = http.createServer(async (request, response) => {
-    Object.keys(require.cache).forEach(key => {
-      delete require.cache[key]
-    })
+    queue.add(() => {
+      // Clear project file cache
+      Object.keys(require.cache).forEach(key => {
+        const inProject = key.startsWith(projectPath)
 
-    const context = {}
-
-    const event = {
-      path: request.url,
-      httpMethod: request.method,
-      headers: request.headers
-    }
-
-    const callback = (error, {
-      statusCode = 200,
-      headers = {},
-      body = '',
-      isBase64Encoded = false
-    } = {}) => {
-      if (error) {
-        console.log(error)
-        response.writeHead(500, { 'Content-Type': 'text/plain' })
-        response.end('Internal server error')
-      } else {
-        response.writeHead(statusCode, headers)
-
-        if (isBase64Encoded) {
-          response.end(Buffer.from(body, 'base64'))
-        } else {
-          response.end(body)
-        }
-      }
-
-      const status = response.statusCode
-
-      let color = colors.gray
-
-      if (status >= 200) {
-        color = colors.green
-      }
-
-      if (status >= 300) {
-        color = colors.blue
-      }
-
-      if (status >= 400) {
-        color = colors.yellow
-      }
-
-      if (status >= 500) {
-        color = colors.red
-      }
-
-      console.log(color(status), request.method, request.url)
-    }
-
-    try {
-      const { handler } = require(path.join(projectPath, 'index.js'))
-
-      const result = handler(event, context, (error, payload) => {
-        if (error) {
-          callback(error)
-        } else {
-          callback(null, payload)
+        if (inProject) {
+          delete require.cache[key]
         }
       })
 
-      if (result) {
-        Promise.resolve(result).then(payload => callback(null, payload))
+      const context = {}
+
+      const event = {
+        path: request.url,
+        httpMethod: request.method,
+        headers: request.headers
       }
-    } catch (error) {
-      callback(error)
-    }
+
+      const callback = (error, {
+        statusCode = 200,
+        headers = {},
+        body = '',
+        isBase64Encoded = false
+      } = {}) => {
+        if (error) {
+          console.log(error)
+          response.writeHead(500, { 'Content-Type': 'text/plain' })
+          response.end('Internal server error')
+        } else {
+          response.writeHead(statusCode, headers)
+
+          if (isBase64Encoded) {
+            response.end(Buffer.from(body, 'base64'))
+          } else {
+            response.end(body)
+          }
+        }
+
+        const status = response.statusCode
+
+        let color = colors.gray
+
+        if (status >= 200) {
+          color = colors.green
+        }
+
+        if (status >= 300) {
+          color = colors.blue
+        }
+
+        if (status >= 400) {
+          color = colors.yellow
+        }
+
+        if (status >= 500) {
+          color = colors.red
+        }
+
+        console.log(color(status), request.method, request.url)
+      }
+
+      try {
+        const { handler } = require(path.join(projectPath, 'index.js'))
+
+        const result = handler(event, context, (error, payload) => {
+          if (error) {
+            callback(error)
+          } else {
+            callback(null, payload)
+          }
+        })
+
+        if (result) {
+          return Promise.resolve(result).then(payload => callback(null, payload))
+        }
+      } catch (error) {
+        return Promise.reject(callback(error))
+      }
+    })
   })
 
   const port = await portfinder.getPortPromise()
