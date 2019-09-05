@@ -104,6 +104,8 @@
         "Handler": "index.handler",
         "Runtime": "nodejs8.10",
         "Role": { "Fn::GetAtt": ["FunctionRole", "Arn"] },
+        "Timeout": 30,
+        "MemorySize": 1024,
         "Code": {
           "ZipFile": "exports.handler = () => {}"
         },
