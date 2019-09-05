@@ -4,11 +4,13 @@ const psl = require('psl')
 const archiver = require('archiver')
 const glob = require('glob')
 const ignore = require('ignore')
-const Table = require('cli-table')
+const colors = require('ansi-colors')
+// const Table = require('cli-table')
+const ora = require('ora')
 const CloudFormation = require('aws-sdk/clients/cloudformation')
 const S3 = require('aws-sdk/clients/s3')
 const Lambda = require('aws-sdk/clients/lambda')
-const ACM = require('aws-sdk/clients/ACM')
+const ACM = require('aws-sdk/clients/acm')
 
 module.exports = async ({
   hostname,
@@ -23,17 +25,16 @@ module.exports = async ({
 
   const certificateDomain = subdomain ? `*.${domain}` : domain
 
-  const recordsTable = new Table({
-    head: ['Type', 'Name', 'Value']
-  })
+  // const recordsTable = new Table({
+  //   head: ['Type', 'Name', 'Value']
+  // })
 
   const acm = new ACM({
     region: 'us-east-1'
   })
 
   let certificateArn = null
-
-  console.log(`Getting certificate for ${certificateDomain}...`)
+  const certificateArnSpinner = ora(`Getting certificate for ${certificateDomain}`).start()
 
   while (!certificateArn) {
     const certificates = await acm.listCertificates({
@@ -45,7 +46,7 @@ module.exports = async ({
     ))[0]
 
     if (!certificate) {
-      console.log('Requesting certificate...')
+      certificateArnSpinner.text = `Requesting certificate for ${certificateDomain}`
 
       certificate = await acm.requestCertificate({
         DomainName: certificateDomain,
@@ -54,40 +55,65 @@ module.exports = async ({
     }
 
     certificateArn = certificate.CertificateArn
+    certificateArnSpinner.succeed()
   }
 
-  let certificateRecord = null
+  let certificateIssued = false
+  let certificateRecordInstructed = false
+  const certificateIssuedSpinner = ora('').start()
 
-  while (!certificateRecord) {
+  while (!certificateIssued) {
+    certificateIssuedSpinner.text = 'Checking validation'
+
     const description = (await acm.describeCertificate({
       CertificateArn: certificateArn
     }).promise()).Certificate
 
     const status = description.Status
 
-    console.log(`Certificate status: ${status}`)
+    // console.log(`Certifi cate status: ${status}`)
 
     switch (status) {
       case 'ISSUED':
+        certificateIssued = true
+        certificateIssuedSpinner.succeed('Validation issued')
+        break
       case 'PENDING_VALIDATION':
-        certificateRecord = description.DomainValidationOptions.map(options => (
+        const certificateRecord = description.DomainValidationOptions.map(options => (
           options.ResourceRecord
         ))[0]
 
-        if (certificateRecord) {
-          recordsTable.push([
-            certificateRecord.Type,
-            certificateRecord.Name,
-            certificateRecord.Value
-          ])
-        } else {
-          await delay(2000)
+        if (certificateRecord && !certificateRecordInstructed) {
+          const { Type, Name, Value } = certificateRecord
+
+          // certificateIssuedSpinner.prefixText()
+          certificateIssuedSpinner.stop()
+
+          console.log(colors.yellow('Make sure the following DNS records are added to the domain:'))
+
+          console.log([
+            `Type: ${Type}`,
+            `Name: ${Name}`,
+            `Value: ${Value}`
+          ].join('\n'))
+
+          certificateIssuedSpinner.start()
+
+          certificateRecordInstructed = true
         }
+
+        certificateIssuedSpinner.text = 'Validation pending'
+
+        // Todo: Don't retry and wait. Just end the dialog
+
+        await delay(5000)
         break
       default:
         throw new Error(status)
     }
   }
+
+  console.log({ certificateArn })
 
   const mainFunctionName = safeLambdaFunctionName(`${hostname}-main`)
   const buildFunctionName = safeLambdaFunctionName(`${hostname}-build`)
@@ -174,13 +200,13 @@ module.exports = async ({
 
   console.log('Deployment success!')
 
-  recordsTable.push([
-    'CNAME',
-    hostname,
-    outputs.DomainName
-  ])
+  // recordsTable.push([
+  //   'CNAME',
+  //   hostname,
+  //   outputs.DomainName
+  // ])
 
-  console.log(recordsTable.toString())
+  // console.log(recordsTable.toString())
 }
 
 async function createOrUpdateStack ({ region, name, template, parameters }) {

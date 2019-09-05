@@ -18,6 +18,7 @@
     "default-gateway": "^5.0.2",
     "glob": "^7.1.4",
     "ignore": "^5.1.2",
+    "ora": "^3.4.0",
     "p-queue": "^6.1.1",
     "portfinder": "^1.0.21",
     "psl": "^1.1.33"

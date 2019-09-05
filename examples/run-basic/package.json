@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "run start",
-    "deploy": "run deploy example.cyberspace.run",
+    "deploy": "run deploy cyberspacetest.tk",
     "test": "standard"
   },
   "dependencies": {
