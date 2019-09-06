@@ -1,62 +1,122 @@
-const S3 = require('aws-sdk/clients/s3')
+const fs = require('fs')
 const { spawn } = require('child_process')
+const S3 = require('aws-sdk/clients/s3')
+
+const bucket = process.env.BUCKET
+const region = process.env.REGION
+
+const s3 = new S3({ region })
 
 exports.handler = async () => {
-  const s3 = new S3({
-    region: process.env.REGION
-  })
+  const tmp = `/tmp`
+  const target = `${tmp}/target`
 
-  const root = `/tmp`
-  const target = `${root}/target`
+  await clean(target)
+  await download('source.tar', `${tmp}/source.tar`)
+  await unpack(`${tmp}/source.tar`, target)
 
-  console.log(`Removing ${target} if it already exists...`)
+  const { dependencies = [] } = require(`${target}/package.json`)
 
-  await shell('rm', ['-rf', target])
+  if (dependencies.length) {
+    console.log(`Installing ${dependencies.length} dependencies...`)
 
-  console.log('Installing unzip...')
+    await shell('npm', [
+      'install',
+      '--prefix', target,
+      '--cache', target,
+      '--production',
+      '--loglevel', 'error',
+      '--no-update-notifier'
+    ], {
+      cwd: target
+    })
+  } else {
+    console.log('No dependencies to install, skipping!')
+  }
 
-  await shell('npm', ['install', 'unzip-stream@0.3.0', '--prefix', root, '--cache', root], { cwd: root })
-  const unzip = require(`${root}/node_modules/unzip-stream`)
+  const modules = [
+    'archiver@3.1.1'
+  ]
 
-  await new Promise((resolve, reject) => {
-    console.log(`Downloading source...`)
+  const modulesFilename = `${modules.join(',')}.tar`
+  const modulesPath = `${tmp}/${modulesFilename}`
+  const modulesFolder = `${tmp}/node_modules`
 
-    s3.getObject({
-      Bucket: process.env.BUCKET,
-      Key: 'source.zip'
-    }).createReadStream()
-      .pipe(unzip.Extract({ path: target }))
-      .on('close', resolve)
-  })
+  try {
+    await download(modulesFilename, modulesPath)
+    await shell('mkdir', ['-p', modulesFolder])
+    await unpack(modulesPath, modulesFolder)
+  } catch (error) {
+    await shell('npm', [
+      'install',
+      ...modules,
+      '--prefix', tmp,
+      '--cache', tmp,
+      '--loglevel', 'error',
+      '--no-update-notifier'
+    ])
 
-  console.log('Installing dependencies...')
+    await pack(modulesFolder, modulesPath)
+    await upload(modulesFilename, modulesPath)
+  }
 
-  await shell('npm', ['install', '--prefix', target, '--cache', target, '--production'], { cwd: target })
+  console.log('Creating zip archive')
 
-  console.log('Installing archiver...')
-
-  await shell('npm', ['install', 'archiver@3.0.0', '--prefix', root, '--cache', root], { cwd: root })
-
-  const archiver = require(`${root}/node_modules/archiver`)
+  const archiver = require(`${modulesFolder}/archiver`)
   const archive = archiver.create('zip')
 
   archive.directory(target, false)
   archive.finalize()
 
-  console.log(`Uploading build...`)
-
-  await s3.upload({
-    Bucket: process.env.BUCKET,
-    Key: 'build.zip',
-    Body: archive
-  }).promise()
+  await upload('target.zip', archive)
 
   console.log('Done')
 }
 
-function shell (command, args = [], options) {
+async function upload (key, source) {
+  console.log('Uploading', key)
+
+  const body = typeof source === 'string'
+    ? fs.createReadStream(source)
+    : source
+
+  return s3.upload({
+    Bucket: bucket,
+    Key: key,
+    Body: body
+  }).promise()
+}
+
+async function download (key, target) {
+  console.log('Downloading', key, 'to', target)
+
+  const body = await s3.getObject({
+    Bucket: bucket,
+    Key: key
+  }).promise()
+
+  fs.writeFileSync(target, body.Body)
+}
+
+async function unpack (source, target) {
+  console.log('Unpacking', source, 'into', target)
+  return shell('tar', ['-xf', source, '-C', target])
+}
+
+async function pack (source, target) {
+  console.log('Packing', source, 'into', target)
+  return shell('tar', ['-cf', target, '-C', source, '.'])
+}
+
+async function clean (target) {
+  console.log('Cleaning', target)
+  await shell('rm', ['-rf', target])
+  await shell('mkdir', ['-p', target])
+}
+
+function shell (command, args = [], options = {}) {
   return new Promise((resolve, reject) => {
-    console.log(command, args, options)
+    console.log('Shell:', command, args.join(' '), options)
 
     const process = spawn(command, args, options)
 

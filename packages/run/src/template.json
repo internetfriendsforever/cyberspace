@@ -248,7 +248,7 @@
             "AcmCertificateArn": { "Ref": "CertificateArn" },
             "SslSupportMethod": "sni-only"
           },
-          "Enabled": false,
+          "Enabled": true,
           "IPV6Enabled": true,
           "HttpVersion": "http2",
           "Origins": [

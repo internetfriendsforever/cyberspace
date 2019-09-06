@@ -5,7 +5,6 @@ const archiver = require('archiver')
 const glob = require('glob')
 const ignore = require('ignore')
 const colors = require('ansi-colors')
-// const Table = require('cli-table')
 const ora = require('ora')
 const CloudFormation = require('aws-sdk/clients/cloudformation')
 const S3 = require('aws-sdk/clients/s3')
@@ -25,95 +24,86 @@ module.exports = async ({
 
   const certificateDomain = subdomain ? `*.${domain}` : domain
 
-  // const recordsTable = new Table({
-  //   head: ['Type', 'Name', 'Value']
-  // })
-
   const acm = new ACM({
     region: 'us-east-1'
   })
 
-  let certificateArn = null
-  const certificateArnSpinner = ora(`Getting certificate for ${certificateDomain}`).start()
+  let certificateArn
 
-  while (!certificateArn) {
-    const certificates = await acm.listCertificates({
-      CertificateStatuses: ['ISSUED', 'PENDING_VALIDATION']
+  const existingCertificateSpinner = ora(`Getting existing certificate for ${certificateDomain}`).start()
+
+  const certificates = await acm.listCertificates({
+    CertificateStatuses: ['ISSUED', 'PENDING_VALIDATION']
+  }).promise()
+
+  const existingCertificate = certificates.CertificateSummaryList.filter(certificate => (
+    certificate.DomainName === certificateDomain
+  ))[0]
+
+  if (existingCertificate) {
+    existingCertificateSpinner.succeed()
+    certificateArn = existingCertificate.CertificateArn
+  } else {
+    existingCertificateSpinner.fail()
+
+    const requestingCertificateSpinner = ora(`Requesting certificate for ${certificateDomain}`).start()
+
+    const requestedCertificate = await acm.requestCertificate({
+      DomainName: certificateDomain,
+      ValidationMethod: 'DNS'
     }).promise()
 
-    let certificate = certificates.CertificateSummaryList.filter(certificate => (
-      certificate.DomainName === certificateDomain
-    ))[0]
-
-    if (!certificate) {
-      certificateArnSpinner.text = `Requesting certificate for ${certificateDomain}`
-
-      certificate = await acm.requestCertificate({
-        DomainName: certificateDomain,
-        ValidationMethod: 'DNS'
-      }).promise()
+    if (requestedCertificate) {
+      requestingCertificateSpinner.succeed()
+      certificateArn = requestedCertificate.CertificateArn
+    } else {
+      requestingCertificateSpinner.fail()
+      return
     }
-
-    certificateArn = certificate.CertificateArn
-    certificateArnSpinner.succeed()
   }
 
+  const certificateIssuedSpinner = ora('Checking certificate status').start()
+
   let certificateIssued = false
-  let certificateRecordInstructed = false
-  const certificateIssuedSpinner = ora('').start()
+  let certificateValidationRecord = null
 
   while (!certificateIssued) {
-    certificateIssuedSpinner.text = 'Checking validation'
-
-    const description = (await acm.describeCertificate({
+    const description = await acm.describeCertificate({
       CertificateArn: certificateArn
-    }).promise()).Certificate
+    }).promise()
 
-    const status = description.Status
-
-    // console.log(`Certifi cate status: ${status}`)
+    const status = description.Certificate.Status
 
     switch (status) {
       case 'ISSUED':
         certificateIssued = true
-        certificateIssuedSpinner.succeed('Validation issued')
+        certificateIssuedSpinner.succeed(`Certificate status: ${status}`)
         break
       case 'PENDING_VALIDATION':
-        const certificateRecord = description.DomainValidationOptions.map(options => (
-          options.ResourceRecord
-        ))[0]
+        const options = description.Certificate.DomainValidationOptions
 
-        if (certificateRecord && !certificateRecordInstructed) {
-          const { Type, Name, Value } = certificateRecord
+        certificateValidationRecord = options && options[0] && options[0].ResourceRecord
 
-          // certificateIssuedSpinner.prefixText()
-          certificateIssuedSpinner.stop()
+        certificateIssuedSpinner.text = `Certificate status: ${status}`
 
-          console.log(colors.yellow('Make sure the following DNS records are added to the domain:'))
+        if (certificateValidationRecord) {
+          const { Type, Name, Value } = certificateValidationRecord
 
-          console.log([
+          certificateIssuedSpinner.text = [
+            `Certificate status: ${status}`,
+            colors.yellow(`Please add the following DNS record to ${domain}:`),
             `Type: ${Type}`,
             `Name: ${Name}`,
             `Value: ${Value}`
-          ].join('\n'))
-
-          certificateIssuedSpinner.start()
-
-          certificateRecordInstructed = true
+          ].join('\n')
         }
 
-        certificateIssuedSpinner.text = 'Validation pending'
-
-        // Todo: Don't retry and wait. Just end the dialog
-
-        await delay(5000)
+        await delay(2000)
         break
       default:
         throw new Error(status)
     }
   }
-
-  console.log({ certificateArn })
 
   const mainFunctionName = safeLambdaFunctionName(`${hostname}-main`)
   const buildFunctionName = safeLambdaFunctionName(`${hostname}-build`)
@@ -152,73 +142,84 @@ module.exports = async ({
     region
   })
 
-  console.log('Uploading source...')
+  const projectUploadSpinner = ora('Uploading project source').start()
 
-  const archive = archiver('zip')
+  const projectSourceArchive = archiver('tar')
 
   const files = ignore()
     .add(['node_modules'])
     .filter(glob.sync('**/*.*', { cwd: projectPath }))
 
   files.forEach(file => {
-    archive.append(fs.createReadStream(path.join(projectPath, file)), { name: file })
+    projectSourceArchive.append(fs.createReadStream(path.join(projectPath, file)), { name: file })
   })
 
-  archive.finalize()
+  projectSourceArchive.finalize()
 
   const s3 = new S3({ region })
 
   await s3.upload({
     Bucket: hostname,
-    Key: 'source.zip',
-    Body: archive
+    Key: 'source.tar',
+    Body: projectSourceArchive
   }).promise()
 
-  console.log('Installing dependencies...')
+  projectUploadSpinner.succeed()
 
   const lambda = new Lambda({ region })
+
+  const installSpinner = ora('Installing dependencies').start()
 
   const buildResult = await lambda.invoke({
     FunctionName: buildFunctionName
   }).promise()
 
   if (buildResult.FunctionError) {
-    throw new Error(`Error while installing dependencies (${buildResult.FunctionError})`)
+    installSpinner.fail()
+    throw new Error(buildResult.FunctionError)
   }
 
   if (buildResult.StatusCode !== 200) {
-    throw new Error(`Build result statusCode ${buildResult.statusCode}. Expected 200`)
+    installSpinner.fail()
+    throw new Error(`Status code: ${buildResult.statusCode}. Expected: 200`)
   }
 
-  console.log('Updating function code...')
+  installSpinner.succeed()
+
+  const updateProjectSourceCode = ora('Updating source function').start()
 
   await lambda.updateFunctionCode({
     FunctionName: mainFunctionName,
     S3Bucket: hostname,
-    S3Key: 'build.zip'
+    S3Key: 'target.zip'
   }).promise()
 
-  console.log('Deployment success!')
+  updateProjectSourceCode.succeed()
 
-  // recordsTable.push([
-  //   'CNAME',
-  //   hostname,
-  //   outputs.DomainName
-  // ])
+  ora(`Deployed ${hostname} successfully`).succeed()
 
-  // console.log(recordsTable.toString())
+  console.log([
+    colors.yellow(`Please add the following DNS record to ${domain}:`),
+    `Type: CNAME`,
+    `Name: ${hostname}`,
+    `Value: ${outputs.DomainName}`
+  ].join('\n'))
 }
 
 async function createOrUpdateStack ({ region, name, template, parameters }) {
   const cloudformation = new CloudFormation({ region })
 
-  console.log(`Validating stack template...`)
+  const validateSpinner = ora('Validating stack template').start()
 
   await cloudformation.validateTemplate({
     TemplateBody: template
   }).promise()
 
+  validateSpinner.succeed()
+
   let exists = false
+
+  const existsSpinner = ora('Checking if stack already exists').start()
 
   try {
     await cloudformation.describeStacks({
@@ -226,17 +227,18 @@ async function createOrUpdateStack ({ region, name, template, parameters }) {
     }).promise()
 
     exists = true
+
+    existsSpinner.succeed()
   } catch (error) {
+    existsSpinner.succeed('Stack does not exist')
+
     if (error.statusCode !== 400) {
+      validateSpinner.fail()
       throw error
     }
   }
 
-  console.log(`${exists ? 'Updating' : 'Creating'} stack...`)
-
-  if (!exists) {
-    console.log('Note: Setting up the initial Cloudfront Distribution takes a long time. It happens only once per hostname, so your next deployment will be a lot faster!')
-  }
+  const createSpinner = ora(`${exists ? 'Updating' : 'Creating'} stack`).start()
 
   try {
     await cloudformation[`${exists ? 'update' : 'create'}Stack`]({
@@ -246,10 +248,14 @@ async function createOrUpdateStack ({ region, name, template, parameters }) {
       Capabilities: ['CAPABILITY_IAM']
     }).promise()
   } catch (error) {
+    if (error.message === 'No updates are to be performed.') {
+      createSpinner.info(error.message)
+    } else {
+      createSpinner.warn(error.message)
+    }
+
     if (error.code !== 'ValidationError') {
       throw error
-    } else {
-      console.warn(error.code, error.message)
     }
   }
 
@@ -271,8 +277,11 @@ async function createOrUpdateStack ({ region, name, template, parameters }) {
             outputs[output.OutputKey] = output.OutputValue
           })
 
-          return outputs
+          if (createSpinner.isSpinning) {
+            createSpinner.succeed()
+          }
 
+          return outputs
         case 'CREATE_IN_PROGRESS':
         case 'UPDATE_IN_PROGRESS':
         case 'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS':
@@ -280,6 +289,7 @@ async function createOrUpdateStack ({ region, name, template, parameters }) {
           break
 
         default:
+          createSpinner.fail()
           throw new Error(status)
       }
     } catch (error) {
