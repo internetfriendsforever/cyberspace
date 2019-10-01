@@ -11,7 +11,9 @@ module.exports = routes => async (event, context, callback) => {
       params: match.params,
       headers: event.headers,
       query: event.queryStringParameters,
-      queryMultiValue: event.multiValueQueryStringParameters
+      queryMultiValue: event.multiValueQueryStringParameters,
+      body: event.body || null,
+      isBase64Encoded: event.isBase64Encoded || null
     })
   } else {
     return {
