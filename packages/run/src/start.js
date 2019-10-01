@@ -17,7 +17,7 @@ module.exports = async ({ projectPath }) => {
   })
 
   const server = http.createServer(async (request, response) => {
-    queue.add(() => {
+    queue.add(async () => {
       // Clear project file cache
       Object.keys(require.cache).forEach(key => {
         const inProject = key.startsWith(projectPath)
@@ -29,7 +29,7 @@ module.exports = async ({ projectPath }) => {
 
       const context = {}
 
-      const event = formatEvent(request)
+      const event = await formatEvent(request)
 
       const callback = (error, {
         statusCode = 200,
@@ -123,7 +123,7 @@ module.exports = async ({ projectPath }) => {
   })
 }
 
-function formatEvent (request) {
+async function formatEvent (request) {
   const urlParts = url.parse(request.url)
   const query = querystring.parse(urlParts.query)
 
@@ -150,5 +150,30 @@ function formatEvent (request) {
     multiValueQueryStringParameters
   }
 
+  const body = await getBody(request)
+
+  if (body) {
+    event.body = Buffer.from(body).toString('base64')
+    event.isBase64Encoded = true
+  }
+
   return event
+}
+
+function getBody (request) {
+  return new Promise((resolve, reject) => {
+    let body = ''
+
+    request.on('data', chunk => {
+      body += chunk.toString()
+    })
+
+    request.on('error', error => {
+      reject(error)
+    })
+
+    request.on('end', () => {
+      resolve(body)
+    })
+  })
 }
