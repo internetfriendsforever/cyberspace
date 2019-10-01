@@ -8,7 +8,7 @@
     "test": "standard"
   },
   "dependencies": {
-    "@cyberspace/run": "^0.3.39",
+    "@cyberspace/run": "^0.3.40",
     "@cyberspace/run-router": "^0.3.35",
     "@cyberspace/run-storage": "^0.3.0"
   },

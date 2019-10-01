@@ -8,7 +8,7 @@
     "test": "standard"
   },
   "dependencies": {
-    "@cyberspace/run": "^0.3.39"
+    "@cyberspace/run": "^0.3.40"
   },
   "devDependencies": {
     "standard": "^12.0.1"
