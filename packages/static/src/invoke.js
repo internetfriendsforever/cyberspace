@@ -17,25 +17,25 @@ if (url) {
 }
 
 function invoke (url) {
-  const result = sitemap[url]()
+  Promise.resolve(sitemap[url]()).then(result => {
+    if (result && result.readable) {
+      const data = []
 
-  if (result && result.readable) {
-    const data = []
+      result.on('data', chunk => {
+        data.push(chunk)
+      })
 
-    result.on('data', chunk => {
-      data.push(chunk)
-    })
-
-    result.on('end', () => {
+      result.on('end', () => {
+        process.send({
+          url,
+          body: Buffer.concat(data).toString()
+        })
+      })
+    } else {
       process.send({
         url,
-        body: Buffer.concat(data).toString()
+        body: result
       })
-    })
-  } else {
-    process.send({
-      url,
-      body: result
-    })
-  }
+    }
+  })
 }

@@ -1,1 +1,1 @@
-module.exports = () => 'All the work!'
+module.exports = async () => 'All the work!'
