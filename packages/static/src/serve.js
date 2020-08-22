@@ -5,11 +5,16 @@ const http = require('http')
 const mime = require('mime')
 
 module.exports = options => {
-  const sitemap = require.resolve(path.join(options.folder, options.sitemap || 'sitemap.js'))
   const script = require.resolve(path.join(__dirname, 'invoke'))
 
   const server = http.createServer((req, res) => {
-    const invoke = child.spawn('node', [script, sitemap, req.url], {
+    const url = new URL(req.url, getBaseUrl(server))
+
+    const invoke = child.spawn('node', [
+      script,
+      options.paths.config,
+      url.pathname
+    ], {
       cwd: process.cwd(),
       stdio: [null, 'pipe', 'pipe', 'ipc']
     })
@@ -40,6 +45,10 @@ module.exports = options => {
   })
 
   server.listen(3000, () => {
-    console.log('Server listening on', server.address().port)
+    console.log('Serving website at', getBaseUrl(server))
   })
+}
+
+function getBaseUrl (server) {
+  return `http://localhost:${server.address().port}`
 }

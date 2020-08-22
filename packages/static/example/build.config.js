@@ -3,7 +3,7 @@ const path = require('path')
 
 const sitemap = {
   '/': require('./src/index'),
-  '/works/': require('./src/works'),
+  '/works': require('./src/works'),
   '/styles.css': () => fs.createReadStream(path.join(__dirname, 'src/styles.css'))
 }
 

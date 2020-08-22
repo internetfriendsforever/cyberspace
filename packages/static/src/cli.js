@@ -1,26 +1,30 @@
 #!/usr/bin/env node
 
-const args = process.argv.slice(2)
-const command = args[0]
+const path = require('path')
+const minimist = require('minimist')
 
-if (!command) {
-  const package = require('../package')
-  console.log(`${package.name} version ${package.version}`)
-  console.log('Usage: static [command]')
-  console.log('Commands:')
-  console.log('  build')
-  console.log('  serve')
+const argv = minimist(process.argv.slice(2))
+const command = argv._ && argv._[0]
+
+if (!command || argv.help) {
+  require('./help')()
   process.exit()
 }
 
-const options = {
-  folder: process.cwd(),
-  sitemap: args[1]
+const input = {
+  folder: argv.folder || argv.f || '.',
+  output: argv.output || argv.o || 'build',
+  config: argv.config || argv.c || 'build.config.js'
+}
+
+const paths = {
+  output: path.resolve(input.folder, input.output),
+  config: path.resolve(input.folder, input.config)
 }
 
 switch (command) {
   case 'build':
-    return require('./build')(options)
+    return require('./build')({ paths })
   case 'serve':
-    return require('./serve')(options)
+    return require('./serve')({ paths })
 }
