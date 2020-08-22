@@ -1,6 +1,8 @@
 const package = require('../package')
 
-module.exports = () => console.log(`
+module.exports.version = package.version
+
+module.exports.instructions = `
 ${package.name} version ${package.version}
 
 Commands:
@@ -18,4 +20,4 @@ Examples:
   static build
   static build --output=public --config=build.js
   static serve --folder=/usr/home/User/Desktop/Project
-`.trim())
+`.trim()

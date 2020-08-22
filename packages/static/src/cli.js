@@ -2,12 +2,18 @@
 
 const path = require('path')
 const minimist = require('minimist')
+const help = require('./help')
 
 const argv = minimist(process.argv.slice(2))
 const command = argv._ && argv._[0]
 
+if (argv.version || argv.v) {
+  console.log(help.version)
+  process.exit()
+}
+
 if (!command || argv.help) {
-  require('./help')()
+  console.log(help.instructions)
   process.exit()
 }
 
