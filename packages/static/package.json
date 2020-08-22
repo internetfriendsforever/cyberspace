@@ -1,0 +1,14 @@
+{
+  "name": "@cyberspace/static",
+  "version": "0.0.1",
+  "description": "Serve and build static websites",
+  "repository": "https://github.com/internetfriendsforever/cyberspace/packages/static",
+  "author": "internetfriendsforever <anyone@internetfriendsforever.com>",
+  "license": "MIT",
+  "bin": {
+    "static": "./src/cli.js"
+  },
+  "dependencies": {
+    "mime": "^2.4.6"
+  }
+}

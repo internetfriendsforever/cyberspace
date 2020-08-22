@@ -1,0 +1,1 @@
+module.exports = () => 'All the work!'
