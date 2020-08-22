@@ -8,6 +8,9 @@
   "bin": {
     "static": "./src/cli.js"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "mime": "^2.4.6",
     "minimist": "^1.2.5"
